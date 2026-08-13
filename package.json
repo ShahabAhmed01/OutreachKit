@@ -1,0 +1,48 @@
+{
+  "name": "leadloop",
+  "version": "1.0.0",
+  "description": "Open-source Instagram & Facebook DM automation tool — scrape commenters, send personalized bulk DMs with daily caps, campaign management, and a modern web dashboard",
+  "main": "gui/server.js",
+  "scripts": {
+    "test": "node test/lib.test.js",
+    "dist": "node scripts/build.js",
+    "gui": "node gui/server.js",
+    "login": "node src/login.js",
+    "scrape": "node src/scrape.js",
+    "scan": "node src/scan-inbox.js",
+    "send": "node src/send.js",
+    "session": "node src/session.js",
+    "report": "node src/report.js"
+  },
+  "keywords": [
+    "instagram",
+    "facebook",
+    "dm-automation",
+    "lead-generation",
+    "instagram-dm",
+    "bulk-dm",
+    "comment-to-dm",
+    "outreach-automation",
+    "social-media-automation",
+    "instagram-marketing",
+    "lead-scraping",
+    "automated-messaging",
+    "instagram-bot",
+    "dm-campaign",
+    "leadloop"
+  ],
+  "author": "Shahab Ahmed",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.62.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShahabAhmed01/LeadLoop.git"
+  },
+  "homepage": "https://github.com/ShahabAhmed01/LeadLoop#readme",
+  "bugs": {
+    "url": "https://github.com/ShahabAhmed01/LeadLoop/issues"
+  }
+}

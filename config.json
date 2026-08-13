@@ -1,0 +1,19 @@
+{
+  "campaigns": [],
+  "activeCampaign": "",
+  "ownerUsername": "",
+  "dailyCap": 50,
+  "delayMinSec": 60,
+  "delayMaxSec": 120,
+  "pauseOnConsecutiveFailures": 3,
+  "pauseMinutes": 30,
+  "commentFilter": {
+    "enabled": false,
+    "keywords": []
+  },
+  "schedule": {
+    "enabled": false,
+    "start": "09:00",
+    "end": "23:00"
+  }
+}

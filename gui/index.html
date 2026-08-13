@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeadLoop — Multi-Platform DM Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#brandGrad)"/>
+            <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <defs><linearGradient id="brandGrad" x1="2" y1="2" x2="22" y2="22"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">LeadLoop</div>
+          <div class="brand-tag">Multi-Platform Automation</div>
+        </div>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Collapse sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Navigation</div>
+      <nav class="nav">
+        <button class="nav-btn active" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="campaigns">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Campaigns</span>
+        </button>
+        <button class="nav-btn" data-view="leads">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Leads</span>
+        </button>
+        <button class="nav-btn" data-view="activity">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Activity</span>
+        </button>
+        <button class="nav-btn" data-view="settings">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-section" id="campaignSidebar">
+      <div class="section-label">Active Campaigns</div>
+      <div class="campaign-list" id="campaignList"></div>
+      <button class="btn-new-campaign" id="btnNewCampaign">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>New Campaign</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-indicator" id="connIndicator">
+        <div class="status-dot"></div>
+        <span id="connLabel">Not connected</span>
+      </div>
+      <div class="version">v2.0.0</div>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        <span class="page-subtitle" id="pageSubtitle">Overview of all campaigns</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill" id="statusPill">
+          <div class="pill-dot"></div>
+          <span id="statusText">Idle</span>
+        </div>
+        <div class="connection-badge" id="connBadge">
+          <div class="conn-dot"></div>
+          <span id="connText">Disconnected</span>
+        </div>
+        <button class="btn btn-ghost btn-icon" id="btnProbe" title="Check session">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Dashboard View -->
+      <section class="view active" data-view="dashboard">
+        <div class="stats-grid">
+          <div class="stat-card stat-total">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+            <div class="stat-info">
+              <div class="stat-value" id="statTotalLeads">0</div>
+              <div class="stat-label">Total Leads</div>
+            </div>
+            <div class="stat-trend up" id="trendLeads">+0 today</div>
+          </div>
+          <div class="stat-card stat-sent">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+            <div class="stat-info">
+              <div class="stat-value" id="statSentToday">0</div>
+              <div class="stat-label">Sent Today</div>
+            </div>
+            <div class="stat-trend" id="trendSent">of 50 cap</div>
+          </div>
+          <div class="stat-card stat-replied">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="stat-info">
+              <div class="stat-value" id="statReplied">0</div>
+              <div class="stat-label">Hot Replies</div>
+            </div>
+          </div>
+          <div class="stat-card stat-remaining">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="stat-info">
+              <div class="stat-value" id="statRemaining">0</div>
+              <div class="stat-label">Remaining</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-card card">
+          <div class="card-header">
+            <h2 class="card-title">Campaign Pipeline</h2>
+            <p class="card-desc">Follow these steps to launch your outreach campaign</p>
+          </div>
+          <div class="pipeline-steps">
+            <div class="pipeline-step" id="stepConnect">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Connect Account</h3>
+                <p>Open a browser window and log into your business account. The session is saved locally.</p>
+              </div>
+              <div class="step-action">
+                <span class="badge" id="bConnect">Pending</span>
+                <button class="btn btn-ghost" id="btnLogin">Connect</button>
+              </div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-step" id="stepScrape">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>Scrape Commenters</h3>
+                <p>Pull all commenters from the post URL. Works for both Instagram and Facebook.</p>
+              </div>
+              <div class="step-action">
+                <span class="badge" id="bGather">Empty</span>
+                <button class="btn btn-ghost" id="btnScrape" disabled>Scrape</button>
+              </div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-step" id="stepScan">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>Detect Already Contacted</h3>
+                <p>Scan your inbox to find people you already messaged and flag replies.</p>
+              </div>
+              <div class="step-action">
+                <span class="badge" id="bScan">Not scanned</span>
+                <button class="btn btn-ghost" id="btnScan" disabled>Scan</button>
+              </div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-step" id="stepLaunch">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3>Launch Campaign</h3>
+                <p>Start sending DMs with natural pacing. Resumable anytime.</p>
+              </div>
+              <div class="step-action">
+                <span class="badge" id="bLaunch">Ready</span>
+                <div class="step-actions">
+                  <button class="btn btn-ghost" id="btnDry">Dry Run</button>
+                  <button class="btn btn-primary" id="btnStart">Start</button>
+                  <button class="btn btn-danger" id="btnStop" disabled>Stop</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Campaigns View -->
+      <section class="view" data-view="campaigns" hidden>
+        <div class="campaigns-header">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="campaignSearch" placeholder="Search campaigns..." spellcheck="false">
+          </div>
+          <button class="btn btn-primary" id="btnNewCampaignMain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Campaign
+          </button>
+        </div>
+        <div class="campaigns-grid" id="campaignsGrid"></div>
+      </section>
+
+      <!-- Leads View -->
+      <section class="view" data-view="leads" hidden>
+        <div class="leads-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="leadsSearch" placeholder="Search username or comment..." spellcheck="false">
+          </div>
+          <div class="filter-chips" id="leadChips">
+            <button class="chip active" data-status="all">All</button>
+            <button class="chip" data-status="new">New</button>
+            <button class="chip" data-status="replied">Replied</button>
+            <button class="chip" data-status="sent">Sent</button>
+            <button class="chip" data-status="contacted">Contacted</button>
+          </div>
+          <div class="leads-info">
+            <span class="lead-count" id="leadCount">0 leads</span>
+            <button class="btn btn-ghost btn-sm" id="btnExportLeads">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Comment</th>
+                <th>Status</th>
+                <th>Sent at</th>
+                <th>Replied at</th>
+              </tr>
+            </thead>
+            <tbody id="leadsBody"></tbody>
+          </table>
+          <div class="empty-state" id="leadsEmpty" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <p>No leads yet. Create a campaign and scrape commenters to get started.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Activity View -->
+      <section class="view" data-view="activity" hidden>
+        <div class="console-container card">
+          <div class="console-header">
+            <h2 class="card-title">Activity Log</h2>
+            <div class="console-actions">
+              <span class="log-count" id="logCount">0 lines</span>
+              <button class="btn btn-ghost btn-sm" id="btnClearLog">Clear</button>
+            </div>
+          </div>
+          <div class="console" id="console"></div>
+        </div>
+      </section>
+
+      <!-- Settings View -->
+      <section class="view" data-view="settings" hidden>
+        <div class="settings-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">General Settings</h2>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Daily Cap</label>
+              <input type="number" id="cfgCap" min="1" max="100" class="form-input">
+              <span class="form-hint">Maximum DMs to send per day</span>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Delay Min (seconds)</label>
+                <input type="number" id="cfgMin" min="2" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Delay Max (seconds)</label>
+                <input type="number" id="cfgMax" min="2" class="form-input">
+              </div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Pause After Failures</label>
+                <input type="number" id="cfgPauseAfter" min="1" max="20" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pause Duration (min)</label>
+                <input type="number" id="cfgPauseMin" min="1" max="600" class="form-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Schedule</h2>
+            </div>
+            <div class="form-group">
+              <label class="form-label checkbox-label">
+                <input type="checkbox" id="schedEnabled" class="form-checkbox">
+                <span>Enable sending schedule</span>
+              </label>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Start Time</label>
+                <input type="time" id="schedStart" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Time</label>
+                <input type="time" id="schedEnd" class="form-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Lead Filter</h2>
+            </div>
+            <p class="form-hint">Only DM leads whose comment contains at least one keyword.</p>
+            <div class="form-group">
+              <label class="form-label checkbox-label">
+                <input type="checkbox" id="filterEnabled" class="form-checkbox">
+                <span>Enable keyword filter</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keywords (comma separated)</label>
+              <input type="text" id="filterKeywords" class="form-input" placeholder="CRM, software, tool" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Data Management</h2>
+            </div>
+            <div class="data-actions">
+              <button class="btn btn-ghost" id="btnCreateBackup">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Create Backup
+              </button>
+              <button class="btn btn-ghost" id="btnExportAll">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export All Data
+              </button>
+            </div>
+            <span class="form-hint" id="backupMsg"></span>
+          </div>
+        </div>
+
+        <div class="settings-footer">
+          <span class="save-status" id="saveMsg"></span>
+          <button class="btn btn-primary" id="btnSaveCfg">Save Settings</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- New Campaign Modal -->
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal" id="campaignModal">
+    <div class="modal-header">
+      <h2>Create New Campaign</h2>
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Step 1: Name & URL -->
+      <div class="wizard-step active" data-step="1">
+        <div class="wizard-step-header">
+          <div class="wizard-number">1</div>
+          <div>
+            <h3>Campaign Details</h3>
+            <p>Enter a name and paste the post URL</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Campaign Name</label>
+          <input type="text" id="wizName" class="form-input" placeholder="e.g., CRM Leads Campaign" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Post/Ad URL</label>
+          <input type="text" id="wizUrl" class="form-input" placeholder="https://www.instagram.com/reel/... or https://www.facebook.com/..." spellcheck="false">
+          <span class="form-hint" id="wizPlatformHint">Supports Instagram posts, reels, and Facebook posts</span>
+        </div>
+        <div class="platform-detected" id="wizPlatformBadge" hidden>
+          <span class="platform-icon" id="wizPlatformIcon"></span>
+          <span id="wizPlatformName"></span>
+        </div>
+      </div>
+
+      <!-- Step 2: Messages -->
+      <div class="wizard-step" data-step="2">
+        <div class="wizard-step-header">
+          <div class="wizard-number">2</div>
+          <div>
+            <h3>Message Variants</h3>
+            <p>Write multiple variants for each step. One will be randomly selected per lead.</p>
+          </div>
+        </div>
+
+        <div class="message-section">
+          <div class="message-section-header">
+            <span class="message-step-label">Step 1</span>
+            <h4>Opening Message</h4>
+            <button class="btn btn-ghost btn-sm add-variant" data-target="text1">+ Add Variant</button>
+          </div>
+          <div id="wizText1" class="variants-container">
+            <div class="variant-row">
+              <input type="text" class="form-input variant-input" placeholder="Hey" spellcheck="false">
+              <button class="btn-icon-only remove-variant" title="Remove">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-section">
+          <div class="message-section-header">
+            <span class="message-step-label">Step 2</span>
+            <h4>Follow-up Message</h4>
+            <button class="btn btn-ghost btn-sm add-variant" data-target="text2">+ Add Variant</button>
+          </div>
+          <div id="wizText2" class="variants-container">
+            <div class="variant-row">
+              <input type="text" class="form-input variant-input" placeholder="I read your comment..." spellcheck="false">
+              <button class="btn-icon-only remove-variant" title="Remove">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-section" id="followupSection">
+          <div class="message-section-header">
+            <span class="message-step-label">Step 3+</span>
+            <h4>Additional Follow-ups (Optional)</h4>
+            <button class="btn btn-ghost btn-sm" id="btnAddFollowup">+ Add Follow-up</button>
+          </div>
+          <div id="wizFollowups"></div>
+        </div>
+
+        <div class="form-hint" style="margin-top: 12px;">
+          Placeholders: <code>{username}</code> <code>{comment}</code> <code>{link}</code> — replaced per lead.
+          Keep the first message short; links hurt deliverability.
+        </div>
+      </div>
+
+      <!-- Step 3: Limits -->
+      <div class="wizard-step" data-step="3">
+        <div class="wizard-step-header">
+          <div class="wizard-number">3</div>
+          <div>
+            <h3>Campaign Limits</h3>
+            <p>Set daily limits and delays to stay safe</p>
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">Daily Cap</label>
+            <input type="number" id="wizCap" class="form-input" value="50" min="1" max="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <input type="text" id="wizPlatform" class="form-input" readonly placeholder="Auto-detected">
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">Delay Min (s)</label>
+            <input type="number" id="wizDelayMin" class="form-input" value="60" min="2">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delay Max (s)</label>
+            <input type="number" id="wizDelayMax" class="form-input" value="120" min="2">
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">Pause After N Failures</label>
+            <input type="number" id="wizPauseAfter" class="form-input" value="3" min="1" max="20">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pause Duration (min)</label>
+            <input type="number" id="wizPauseMin" class="form-input" value="30" min="1" max="600">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label checkbox-label">
+            <input type="checkbox" id="wizSchedule" class="form-checkbox">
+            <span>Enable sending schedule</span>
+          </label>
+        </div>
+        <div class="form-row cols-2" id="wizScheduleRow" hidden>
+          <div class="form-group">
+            <label class="form-label">Start Time</label>
+            <input type="time" id="wizSchedStart" class="form-input" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Time</label>
+            <input type="time" id="wizSchedEnd" class="form-input" value="23:00">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="wizBack" hidden>Back</button>
+      <div class="modal-footer-right">
+        <button class="btn btn-ghost" id="wizCancel">Cancel</button>
+        <button class="btn btn-primary" id="wizNext">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

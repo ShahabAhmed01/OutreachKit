@@ -1,0 +1,11 @@
+{
+  "assets": [
+    "src/**/*",
+    "gui/**/*",
+    "test/**/*",
+    "package.json"
+  ],
+  "targets": [
+    "node24-win-x64"
+  ]
+}

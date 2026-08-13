@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Runtime data (user-specific, never committed)
+data/campaigns/
+data/already-contacted.csv
+data/commenters.csv
+data/sent.csv
+data/replied.csv
+data/logs.txt
+data/backups/
+
+# Browser session (contains cookies/auth — NEVER commit)
+profile/
+
+# Build output
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp files
+test/_debug.js
+test/_screenshots.js
+screenshots/
