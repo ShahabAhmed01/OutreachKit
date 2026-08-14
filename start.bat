@@ -1,15 +1,15 @@
 @echo off
 setlocal
-title LeadLoop
+title OutreachKit
 chcp 65001 >nul 2>nul
 cd /d "%~dp0"
 
-set "URL=http://localhost:4876"
+set "URL=http://localhost:3000"
 set "NODE=node"
 
 echo.
 echo   ==========================================
-echo     LeadLoop - Instagram DM automation
+echo     OutreachKit - Instagram DM automation
 echo   ==========================================
 echo.
 
@@ -48,8 +48,8 @@ if not exist "%CHROME%" set "CHROME=C:\Program Files (x86)\Google\Chrome\Applica
 powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 '%URL%/api/status') | Out-Null; exit 0 } catch { exit 1 }" >nul 2>nul
 if not errorlevel 1 goto already
 
-echo   Starting LeadLoop...
-set "LEADLOOP_NO_OPEN=1"
+echo   Starting OutreachKit...
+set "OUTREACHKIT_NO_OPEN=1"
 start "" /B "%NODE%" "%~dp0gui\server.js"
 
 set "READY=0"
@@ -82,7 +82,7 @@ pause
 exit /b 1
 
 :already
-echo   LeadLoop is already running - opening Chrome.
+echo   OutreachKit is already running - opening Chrome.
 if exist "%CHROME%" (
   start "" "%CHROME%" "%URL%"
 ) else (
@@ -92,5 +92,5 @@ exit /b 0
 
 :stopped
 echo.
-echo   LeadLoop stopped.
+echo   OutreachKit stopped.
 pause

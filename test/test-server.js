@@ -1,41 +1,63 @@
 ﻿'use strict';
+
 const http = require('http');
 const { spawn } = require('child_process');
 const path = require('path');
 
-let P = 0, F = 0;
-function ok(label) { P++; }
-function fail(label, msg) { F++; console.error('FAIL [' + label + ']: ' + msg); }
-function check(label, cond, msg) { if (cond) ok(label); else fail(label, msg || String(cond)); }
+let P = 0;
+let F = 0;
+function ok(label) {
+  P++;
+}
+function fail(label, msg) {
+  F++;
+  console.error('FAIL [' + label + ']: ' + msg);
+}
+function check(label, cond, msg) {
+  if (cond) ok(label);
+  else fail(label, msg || String(cond));
+}
 
 function req(method, urlPath, body, timeout) {
   timeout = timeout || 3000;
   return new Promise((resolve) => {
-    const opts = { hostname: 'localhost', port: 4876, path: urlPath, method, headers: {}, timeout };
+    const opts = {
+      hostname: 'localhost',
+      port: 3000,
+      path: urlPath,
+      method,
+      headers: {},
+      timeout,
+    };
     if (body) opts.headers['Content-Type'] = 'application/json';
-    const r = http.request(opts, res => {
+    const r = http.request(opts, (res) => {
       let data = '';
-      res.on('data', d => data += d);
+      res.on('data', (d) => (data += d));
       res.on('end', () => {
         let json = null;
-        try { json = JSON.parse(data); } catch {}
+        try {
+          json = JSON.parse(data);
+        } catch {}
         resolve({ status: res.statusCode, body: data, json });
       });
     });
     r.on('error', () => resolve({ status: 0, body: '', json: null }));
-    r.on('timeout', () => { r.destroy(); resolve({ status: 0, body: 'TIMEOUT', json: null }); });
+    r.on('timeout', () => {
+      r.destroy();
+      resolve({ status: 0, body: 'TIMEOUT', json: null });
+    });
     if (body) r.write(typeof body === 'string' ? body : JSON.stringify(body));
     r.end();
   });
 }
 
 (async () => {
-  const child = spawn(process.execPath, [path.join(__dirname, '..', 'gui', 'server.js')], {
+  const child = spawn(process.execPath, [path.join(__dirname, '..', 'src', 'server.js')], {
     cwd: path.join(__dirname, '..'),
-    env: { ...process.env, LEADLOOP_NO_OPEN: '1' },
-    stdio: 'ignore'
+    env: { ...process.env, OUTREACHKIT_NO_OPEN: '1', PORT: '3000' },
+    stdio: 'ignore',
   });
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 2000));
 
   try {
     // Static files
@@ -52,7 +74,7 @@ function req(method, urlPath, body, timeout) {
 
     // SSE (with short timeout since it streams)
     r = await req('GET', '/events', null, 1500);
-    check('GET /events 200 or stream', r.status === 200 || r.status === 0); // SSE stays open
+    check('GET /events 200 or stream', r.status === 200 || r.status === 0);
 
     // Dashboard
     r = await req('GET', '/api/dashboard');
@@ -85,7 +107,11 @@ function req(method, urlPath, body, timeout) {
     check('GET /api/campaigns 200', r.status === 200);
     check('campaigns array', Array.isArray(r.json));
 
-    r = await req('POST', '/api/campaigns', { name: 'API Test', url: 'https://instagram.com/reel/1', text1: ['Hey {username}'] });
+    r = await req('POST', '/api/campaigns', {
+      name: 'API Test',
+      url: 'https://instagram.com/reel/1',
+      text1: ['Hey {username}'],
+    });
     check('create campaign 201', r.status === 201);
     check('campaign has id', r.json && r.json.id);
     const cid = r.json.id;
@@ -120,12 +146,12 @@ function req(method, urlPath, body, timeout) {
     r = await req('POST', '/api/campaigns/' + cid + '/scrape');
     check('scrape 200', r.status === 200);
     check('scrape ok', r.json && r.json.ok);
-    await new Promise(res => setTimeout(res, 2000));
+    await new Promise((res) => setTimeout(res, 2000));
 
     // Start
     r = await req('POST', '/api/campaigns/' + cid + '/start');
     check('start 200', r.status === 200);
-    await new Promise(res => setTimeout(res, 500));
+    await new Promise((res) => setTimeout(res, 500));
 
     // Pause
     r = await req('POST', '/api/campaigns/' + cid + '/pause');
@@ -190,13 +216,14 @@ function req(method, urlPath, body, timeout) {
     check('unknown GET 404', r.status === 404);
     r = await req('POST', '/api/unknown');
     check('unknown POST 404', r.status === 404);
-
   } finally {
     child.kill();
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   console.log('\n=== SERVER API: ' + P + ' passed, ' + F + ' failed ===');
   if (F > 0) process.exit(1);
-})().catch(e => { console.error(e); process.exit(1); });
-
+})().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

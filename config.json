@@ -1,10 +1,10 @@
 {
   "campaigns": [],
-  "activeCampaign": "",
+  "activeCampaign": "c_mssjfadz_csdkw",
   "ownerUsername": "",
   "dailyCap": 50,
-  "delayMinSec": 60,
-  "delayMaxSec": 120,
+  "delayMinSec": 3600,
+  "delayMaxSec": 3600,
   "pauseOnConsecutiveFailures": 3,
   "pauseMinutes": 30,
   "commentFilter": {

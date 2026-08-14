@@ -8,7 +8,7 @@ const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const CAMPAIGNS_DIR = path.join(ROOT, 'data', 'campaigns');
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
-const NAME = `leadloop-${pkg.version}`;
+const NAME = `outreachkit-${pkg.version}`;
 const OUT = path.join(DIST, NAME);
 
 fs.rmSync(DIST, { recursive: true, force: true });
@@ -47,10 +47,10 @@ try {
   console.log('ZIP failed: ' + String(e.message || e).split('\n')[0]);
 }
 
-if (process.env.LEADLOOP_BUILD_EXE === '1') {
+if (process.env.OUTREACHKIT_BUILD_EXE === '1') {
   try {
-    execFileSync('npx', ['@yao-pkg/pkg', 'gui/server.js', '--targets', 'node24-win-x64', '--config', path.join(ROOT, 'scripts', 'pkg-config.json'), '--output', path.join(OUT, 'LeadLoop.exe')], { cwd: ROOT, stdio: 'inherit' });
-    console.log('EXE created: ' + path.join(OUT, 'LeadLoop.exe'));
+    execFileSync('npx', ['@yao-pkg/pkg', 'gui/server.js', '--targets', 'node24-win-x64', '--config', path.join(ROOT, 'scripts', 'pkg-config.json'), '--output', path.join(OUT, 'OutreachKit.exe')], { cwd: ROOT, stdio: 'inherit' });
+    console.log('EXE created: ' + path.join(OUT, 'OutreachKit.exe'));
   } catch (e) {
     console.log('EXE build skipped (pkg not installed or failed): ' + String(e.message || e).split('\n')[0]);
   }

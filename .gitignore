@@ -9,12 +9,17 @@ data/sent.csv
 data/replied.csv
 data/logs.txt
 data/backups/
+data/.logged-in
+data/stop.flag
 
 # Browser session (contains cookies/auth — NEVER commit)
 profile/
 
 # Build output
 dist/
+
+# Coverage
+coverage/
 
 # OS files
 .DS_Store
@@ -36,3 +41,7 @@ npm-debug.log*
 test/_debug.js
 test/_screenshots.js
 screenshots/
+
+# Environment
+.env
+.env.local

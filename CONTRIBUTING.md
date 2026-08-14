@@ -1,4 +1,4 @@
-# Contributing to LeadLoop
+# Contributing to OutreachKit
 
 Thanks for your interest in contributing! Here's how to get started:
 
@@ -13,15 +13,24 @@ Thanks for your interest in contributing! Here's how to get started:
 ## Development
 
 ```bash
-npm run gui          # Start the dashboard
-npm test             # Run tests
+npm start          # Start the dashboard
+npm test           # Run tests
+npm run lint       # Lint code
+npm run format     # Format code
 ```
+
+## Code Style
+
+- Use ES2022+ features (no `var`, prefer `const`)
+- Single quotes, no trailing commas
+- 100 character line limit
+- Run `npm run format` before committing
 
 ## Pull Requests
 
 - Keep PRs focused on a single change
 - Add tests for new functionality
-- Run `npm test` before submitting
+- Run `npm test` and `npm run lint` before submitting
 - Follow the existing code style
 
 ## Reporting Bugs

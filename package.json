@@ -1,17 +1,27 @@
 {
-  "name": "leadloop",
+  "name": "outreachkit",
   "version": "1.0.0",
-  "description": "Open-source Instagram & Facebook DM automation tool — scrape commenters, send personalized bulk DMs with daily caps, campaign management, and a modern web dashboard",
-  "main": "gui/server.js",
+  "description": "Open-source Instagram & Facebook DM automation — scrape commenters, send personalized bulk DMs with daily caps, campaign management, and a modern web dashboard",
+  "main": "src/server.js",
+  "bin": {
+    "outreachkit": "src/server.js"
+  },
   "scripts": {
-    "test": "node test/lib.test.js",
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node --test test/*.test.js",
+    "test:coverage": "c8 node --test test/*.test.js",
+    "lint": "eslint src/ gui/ test/",
+    "lint:fix": "eslint src/ gui/ test/ --fix",
+    "format": "prettier --write \"src/**/*.js\" \"gui/**/*.js\" \"test/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"gui/**/*.js\" \"test/**/*.js\"",
     "dist": "node scripts/build.js",
-    "gui": "node gui/server.js",
+    "gui": "node src/server.js",
     "login": "node src/login.js",
     "scrape": "node src/scrape.js",
-    "scan": "node src/scan-inbox.js",
+    "scan": "node src/inbox.js",
     "send": "node src/send.js",
-    "session": "node src/session.js",
+    "session": "node src/auth.js",
     "report": "node src/report.js"
   },
   "keywords": [
@@ -29,20 +39,33 @@
     "automated-messaging",
     "instagram-bot",
     "dm-campaign",
-    "leadloop"
+    "outreachkit"
   ],
   "author": "Shahab Ahmed",
   "license": "MIT",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
-    "playwright": "^1.62.1"
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^8.0.0",
+    "playwright": "^1.62.1",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "c8": "^10.1.0",
+    "eslint": "^9.12.0",
+    "prettier": "^3.3.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ShahabAhmed01/LeadLoop.git"
+    "url": "https://github.com/ShahabAhmed01/OutreachKit.git"
   },
-  "homepage": "https://github.com/ShahabAhmed01/LeadLoop#readme",
+  "homepage": "https://github.com/ShahabAhmed01/OutreachKit#readme",
   "bugs": {
-    "url": "https://github.com/ShahabAhmed01/LeadLoop/issues"
+    "url": "https://github.com/ShahabAhmed01/OutreachKit/issues"
   }
 }
