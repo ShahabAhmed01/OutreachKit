@@ -38,7 +38,7 @@ const app = express();
 
 // Security
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || `http://localhost:${PORT}` }));
 app.use(express.json({ limit: '1mb' }));
 
 // Rate limiting
@@ -91,6 +91,10 @@ function serveStatic(req, res) {
   const file = req.path === '/' ? 'index.html' : req.path.slice(1);
   const p = path.join(GUI, file);
   if (!fs.existsSync(p)) return res.status(404).json({ error: 'missing' });
+  const resolved = path.resolve(p);
+  if (!resolved.startsWith(GUI + path.sep) && resolved !== GUI) {
+    return res.status(404).json({ error: 'missing' });
+  }
   res.set('Content-Type', MIME[path.extname(p)] || 'text/plain');
   res.set('Cache-Control', 'no-store');
   fs.createReadStream(p).pipe(res);
@@ -571,9 +575,10 @@ app.post('/api/exit', (req, res) => {
 // ─── Logs ───
 app.get('/api/log', (req, res) => {
   const n = parseInt(req.query.n || '200', 10);
+  const limit = Number.isFinite(n) && n > 0 ? Math.min(n, 5000) : 200;
   let lines = [];
   try {
-    lines = fs.readFileSync(LOG, 'utf8').split(/\r?\n/).filter(Boolean).slice(-n);
+    lines = fs.readFileSync(LOG, 'utf8').split(/\r?\n/).filter(Boolean).slice(-limit);
   } catch {}
   res.json(lines);
 });

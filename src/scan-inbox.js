@@ -39,13 +39,15 @@ function parseArgs() {
 
     const existingContacted = new Map();
     readCsv('already-contacted.csv', campaignId).forEach((r) => {
-      if (r.username && !existingContacted.has(r.username))
-        {existingContacted.set(r.username, r.detected_at || nowIso());}
+      if (r.username && !existingContacted.has(r.username)) {
+        existingContacted.set(r.username, r.detected_at || nowIso());
+      }
     });
     const sentRows = readCsv('sent.csv', campaignId).filter((r) => r.username);
     sentRows.forEach((r) => {
-      if (!existingContacted.has(r.username))
-        {existingContacted.set(r.username, r.sent_at || nowIso());}
+      if (!existingContacted.has(r.username)) {
+        existingContacted.set(r.username, r.sent_at || nowIso());
+      }
     });
     if (sentRows.length) ok(`Loaded ${sentRows.length} contacts from sent.csv history.`);
 
@@ -131,8 +133,9 @@ function parseArgs() {
           body: b
         });
         const t = await r.text();
-        if (!t.trim().startsWith('{'))
-          {throw new Error('GraphQL returned a page (status ' + r.status + ')');}
+        if (!t.trim().startsWith('{')) {
+          throw new Error('GraphQL returned a page (status ' + r.status + ')');
+        }
         return JSON.parse(t);
       }, body);
     }

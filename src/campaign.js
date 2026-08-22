@@ -25,15 +25,13 @@ function createCampaign(name, platform, postUrl) {
     id,
     name: name || 'Untitled Campaign',
     platform: detectPlatform(postUrl) || platform || 'instagram',
-    postUrl: postUrl || '',
+    url: postUrl || '',
     status: 'draft',
     createdAt: nowIso(),
     updatedAt: nowIso(),
-    messages: {
-      text1: [{ id: 'm1', content: 'Hey' }],
-      text2: [{ id: 'm2', content: 'I read your comment under a post — are you interested?' }],
-      followups: []
-    },
+    text1: [{ id: 'm1', content: 'Hey' }],
+    text2: [{ id: 'm2', content: 'I read your comment under a post — are you interested?' }],
+    followups: [],
     dailyCap: 50,
     delayMinSec: 60,
     delayMaxSec: 120,
@@ -123,7 +121,7 @@ function listCampaigns() {
   for (const c of cfg.campaigns) {
     const campaign = loadCampaign(c.id);
     if (campaign) {
-      valid.push({ ...c, status: campaign.status, postUrl: campaign.postUrl });
+      valid.push({ ...c, status: campaign.status, url: campaign.url });
     }
   }
   if (valid.length !== cfg.campaigns.length) {

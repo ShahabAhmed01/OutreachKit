@@ -161,8 +161,9 @@ async function sendToFacebook(page, lead, msgs) {
     waitUntil: 'domcontentloaded',
     timeout: 60000
   });
-  if (page.url().includes('login') || page.url().includes('checkpoint'))
-    {throw new Error('SESSION_EXPIRED');}
+  if (page.url().includes('login') || page.url().includes('checkpoint')) {
+    throw new Error('SESSION_EXPIRED');
+  }
 
   await page.waitForTimeout(3000);
 
@@ -238,13 +239,9 @@ async function sendToFacebook(page, lead, msgs) {
   }
 
   // Build exclusion sets
-  const sentFile = campaignId ? 'sent.csv' : 'sent.csv';
-  const contactedFile = campaignId ? 'already-contacted.csv' : 'already-contacted.csv';
-  const repliedFile = campaignId ? 'replied.csv' : 'replied.csv';
-
-  const sent = new Set(readCsv(sentFile, campaignId).map((r) => r.username));
-  const contacted = new Set(readCsv(contactedFile, campaignId).map((r) => r.username));
-  const replied = new Set(readCsv(repliedFile, campaignId).map((r) => r.username));
+  const sent = new Set(readCsv('sent.csv', campaignId).map((r) => r.username));
+  const contacted = new Set(readCsv('already-contacted.csv', campaignId).map((r) => r.username));
+  const replied = new Set(readCsv('replied.csv', campaignId).map((r) => r.username));
   const queue = filtered.filter(
     (r) => !sent.has(r.username) && !contacted.has(r.username) && !replied.has(r.username)
   );
@@ -272,7 +269,7 @@ async function sendToFacebook(page, lead, msgs) {
   }
 
   // Daily cap
-  const sentToday = readCsv(sentFile, campaignId).filter((r) =>
+  const sentToday = readCsv('sent.csv', campaignId).filter((r) =>
     (r.sent_at || '').startsWith(todayKey())
   ).length;
   const dailyCap = campaign ? campaign.dailyCap || cfg.dailyCap || 50 : cfg.dailyCap;
@@ -330,7 +327,7 @@ async function sendToFacebook(page, lead, msgs) {
           continue;
         }
 
-        appendCsv(sentFile, { username: lead.username, sent_at: nowIso() }, campaignId);
+        appendCsv('sent.csv', { username: lead.username, sent_at: nowIso() }, campaignId);
         sentCount++;
         consecutive = 0;
         ok(`Sent to @${lead.username} — "${msgs[0]}" then ${msgs.length - 1} follow-up messages`);

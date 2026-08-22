@@ -137,9 +137,9 @@ async function apiGet(ctx, url) {
 async function apiPost(ctx, url, body) {
   const p = await apiPage(ctx);
   const r = await p.evaluate(
-    async ({ url, body }) => {
+    async ({ url: targetUrl, body: postData }) => {
       try {
-        const res = await fetch(url, {
+        const res = await fetch(targetUrl, {
           method: 'POST',
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
@@ -148,7 +148,7 @@ async function apiPost(ctx, url, body) {
             accept: 'application/json, text/plain, */*'
           },
           credentials: 'include',
-          body
+          body: postData
         });
         return { status: res.status, text: await res.text() };
       } catch (e) {

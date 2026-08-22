@@ -305,16 +305,18 @@
     if (filter === 'new') leads = state.leads || [];
     else if (filter === 'sent') leads = state.sentLeads || [];
     else if (filter === 'replied') leads = state.repliedLeads || [];
-    else
-      {leads = [...(state.leads || []), ...(state.sentLeads || []), ...(state.repliedLeads || [])];}
+    else {
+      leads = [...(state.leads || []), ...(state.sentLeads || []), ...(state.repliedLeads || [])];
+    }
 
     const q = (state.search || '').toLowerCase();
-    if (q)
-      {leads = leads.filter(
+    if (q) {
+      leads = leads.filter(
         (l) =>
           (l.username || '').toLowerCase().includes(q) ||
           (l.comment || '').toLowerCase().includes(q)
-      );}
+      );
+    }
 
     const countEl = $('#lead-count');
     if (countEl) countEl.textContent = `${leads.length} lead${leads.length !== 1 ? 's' : ''}`;
@@ -375,9 +377,9 @@
         e.preventDefault();
         const data = {
           dailyCap: parseInt($('#daily-cap').value) || 50,
-          minDelay: parseInt($('#min-delay').value) || 30,
-          maxDelay: parseInt($('#max-delay').value) || 90,
-          messagePause: parseInt($('#message-pause').value) || 180,
+          delayMinSec: parseInt($('#min-delay').value) || 30,
+          delayMaxSec: parseInt($('#max-delay').value) || 90,
+          pauseMinutes: parseInt($('#message-pause').value) || 180,
           text1: $('#text1').value,
           followups: $('#followups')
             .value.split('\n')
@@ -414,9 +416,9 @@
       if (el) el.value = v ?? '';
     };
     set('daily-cap', c.dailyCap || 50);
-    set('min-delay', c.minDelay || 30);
-    set('max-delay', c.maxDelay || 90);
-    set('message-pause', c.messagePause || 180);
+    set('min-delay', c.delayMinSec || 30);
+    set('max-delay', c.delayMaxSec || 90);
+    set('message-pause', c.pauseMinutes || 180);
     set('text1', c.text1 || '');
     set('followups', (c.followups || []).join('\n'));
     set('already-contacted-file', c.alreadyContactedFile || '');

@@ -161,7 +161,7 @@ function validateJobBody(body) {
     return { valid: false, error: 'Job name is required' };
   }
 
-  const validJobs = ['probe', 'scrape', 'send', 'scan', 'report'];
+  const validJobs = ['probe', 'scrape', 'send', 'scan', 'report', 'login', 'connect'];
   if (!validJobs.includes(body.name)) {
     return { valid: false, error: `Unknown job: ${body.name}` };
   }

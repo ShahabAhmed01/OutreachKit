@@ -135,10 +135,11 @@ async function scrapeInstagram(url, campaignId) {
       html.match(/"media_id":"(\d+)(?:_\d+)?"/) ||
       html.match(/"mediaId":"(\d+)"/) ||
       html.match(/\/media\/(\d+)\/comments/);
-    if (!idMatch)
-      {throw new Error(
+    if (!idMatch) {
+      throw new Error(
         'Could not find the media id in the page — check the reel URL and that you are logged in.'
-      );}
+      );
+    }
     const mediaId = idMatch[1];
 
     const owner = await findOwner(page);
@@ -187,8 +188,9 @@ async function scrapeInstagram(url, campaignId) {
           body: b
         });
         const t = await r.text();
-        if (!t.trim().startsWith('{'))
-          {throw new Error('GraphQL returned a page (status ' + r.status + ')');}
+        if (!t.trim().startsWith('{')) {
+          throw new Error('GraphQL returned a page (status ' + r.status + ')');
+        }
         return JSON.parse(t);
       }, body);
     }
@@ -229,8 +231,9 @@ async function scrapeInstagram(url, campaignId) {
         const vars = { ...baseVars, first: 50, last: null, before: null, after };
         const j = await gql(paginationParams, vars);
         const conn = (j.data && Object.values(j.data)[0]) || null;
-        if (!conn || !Array.isArray(conn.edges))
-          {throw new Error('Unexpected comments response shape');}
+        if (!conn || !Array.isArray(conn.edges)) {
+          throw new Error('Unexpected comments response shape');
+        }
         for (const e of conn.edges) {
           const n = e.node;
           if (!n || !n.pk) continue;
@@ -354,8 +357,9 @@ async function scrapeFacebook(url, campaignId) {
     const page = await ctx.newPage();
     page.setDefaultTimeout(25000);
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 90000 });
-    if (page.url().includes('login') || page.url().includes('checkpoint'))
-      {throw new Error('SESSION_EXPIRED');}
+    if (page.url().includes('login') || page.url().includes('checkpoint')) {
+      throw new Error('SESSION_EXPIRED');
+    }
     await page.waitForTimeout(5000);
 
     const users = new Map();
