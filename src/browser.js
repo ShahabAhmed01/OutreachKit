@@ -2,24 +2,54 @@
 
 const { chromium } = require('playwright');
 const fs = require('fs');
-const { ROOT, PROFILE, ensureData } = require('./config');
+const { execFileSync } = require('child_process');
+const { PROFILE, ensureData } = require('./config');
 
-const CHANNEL_CANDIDATES = [
+const WIN_CANDIDATES = [
   { path: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', channel: 'chrome' },
   { path: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe', channel: 'chrome' },
   {
     path: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-    channel: 'msedge',
+    channel: 'msedge'
   },
-  { path: 'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe', channel: 'msedge' },
+  { path: 'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe', channel: 'msedge' }
 ];
 
-function findChannel() {
-  const hit = CHANNEL_CANDIDATES.find((c) => fs.existsSync(c.path));
-  return hit ? hit.channel : null;
+const LINUX_BINS = [
+  ['google-chrome-stable', 'chrome'],
+  ['google-chrome', 'chrome'],
+  ['chrome', 'chrome'],
+  ['microsoft-edge-stable', 'msedge'],
+  ['microsoft-edge', 'msedge'],
+  ['brave-browser', 'chrome'],
+  ['chromium', null],
+  ['chromium-browser', null]
+];
+
+function whichBin(bin) {
+  try {
+    return execFileSync('which', [bin], { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch {
+    return '';
+  }
 }
 
-async function launch(headless) {
+function findChannel() {
+  if (process.platform === 'win32') {
+    const hit = WIN_CANDIDATES.find((c) => fs.existsSync(c.path));
+    return hit ? hit.channel : null;
+  }
+  if (process.platform === 'linux' || process.platform === 'darwin') {
+    for (const [bin, channel] of LINUX_BINS) {
+      if (whichBin(bin)) return channel;
+    }
+  }
+  return null;
+}
+
+function launch(headless) {
   ensureData();
   const channel = findChannel();
   return chromium.launchPersistentContext(PROFILE, {
@@ -30,8 +60,8 @@ async function launch(headless) {
       '--disable-blink-features=AutomationControlled',
       '--no-first-run',
       '--no-default-browser-check',
-      '--start-maximized',
-    ],
+      '--start-maximized'
+    ]
   });
 }
 
@@ -72,9 +102,9 @@ async function apiGet(ctx, url) {
         headers: {
           'x-ig-app-id': '936619743392459',
           'x-requested-with': 'XMLHttpRequest',
-          accept: 'application/json, text/plain, */*',
+          accept: 'application/json, text/plain, */*'
         },
-        credentials: 'include',
+        credentials: 'include'
       });
       return { status: res.status, text: await res.text() };
     } catch (e) {
@@ -97,7 +127,7 @@ async function apiGet(ctx, url) {
       throw new Error(
         j.message === 'login_required' || j.message === 'Not Authorized'
           ? 'SESSION_EXPIRED'
-          : `API error: ${j.message}`,
+          : `API error: ${j.message}`
       );
     }
   }
@@ -115,17 +145,17 @@ async function apiPost(ctx, url, body) {
             'content-type': 'application/x-www-form-urlencoded',
             'x-ig-app-id': '936619743392459',
             'x-requested-with': 'XMLHttpRequest',
-            accept: 'application/json, text/plain, */*',
+            accept: 'application/json, text/plain, */*'
           },
           credentials: 'include',
-          body,
+          body
         });
         return { status: res.status, text: await res.text() };
       } catch (e) {
         return { status: 0, text: 'NETWORK_ERROR ' + e.message };
       }
     },
-    { url, body },
+    { url, body }
   );
   const text = r.text || '';
   if (r.status === 401 || r.status === 403) throw new Error('SESSION_EXPIRED');
@@ -143,7 +173,7 @@ async function apiPost(ctx, url, body) {
       throw new Error(
         j.message === 'login_required' || j.message === 'Not Authorized'
           ? 'SESSION_EXPIRED'
-          : `API error: ${j.message}`,
+          : `API error: ${j.message}`
       );
     }
   }
@@ -155,5 +185,5 @@ module.exports = {
   apiGet,
   apiPost,
   getUA,
-  apiPage,
+  apiPage
 };

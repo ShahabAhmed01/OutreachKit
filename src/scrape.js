@@ -1,6 +1,19 @@
 'use strict';
 
-const { loadConfig, loadCampaign, saveCampaign, launch, writeCsv, info, ok, warn, err, step, sleep, detectPlatform } = require('./lib');
+const {
+  loadConfig,
+  loadCampaign,
+  saveCampaign,
+  launch,
+  writeCsv,
+  info,
+  ok,
+  warn,
+  err,
+  step,
+  sleep,
+  detectPlatform
+} = require('./lib');
 
 const CACHED_PAGINATION_PARAMS = [
   'av=17841437861955722',
@@ -55,17 +68,15 @@ function parseArgs() {
   return { campaignId };
 }
 
-function getCampaignDir(campaignId) {
-  if (!campaignId) return null;
-  const lib = require('./lib');
-  return lib.DATA ? require('path').join(lib.DATA, 'campaigns', campaignId) : null;
-}
-
 function saveCsv(users, owner, campaignId) {
   const filtered = new Map(users);
   if (owner) filtered.delete(owner);
   const rows = [...filtered.entries()]
-    .map(([username, v]) => ({ username, comment: v.comment, commented_at: v.ts ? new Date(v.ts * 1000).toISOString() : '' }))
+    .map(([username, v]) => ({
+      username,
+      comment: v.comment,
+      commented_at: v.ts ? new Date(v.ts * 1000).toISOString() : ''
+    }))
     .sort((a, b) => a.commented_at.localeCompare(b.commented_at));
   if (campaignId) {
     writeCsv('commenters.csv', rows, campaignId);
@@ -94,7 +105,9 @@ async function findOwner(page) {
   } catch {}
   try {
     const html = await page.content();
-    const m = html.match(/"owner":\{"username":"([A-Za-z0-9._]+)"/) || html.match(/"username":"([A-Za-z0-9._]{3,})","full_name"/);
+    const m =
+      html.match(/"owner":\{"username":"([A-Za-z0-9._]+)"/) ||
+      html.match(/"username":"([A-Za-z0-9._]{3,})","full_name"/);
     return m ? m[1] : null;
   } catch {
     return null;
@@ -105,7 +118,7 @@ async function findOwner(page) {
 async function scrapeInstagram(url, campaignId) {
   const cfg = loadConfig();
   const campaign = campaignId ? loadCampaign(campaignId) : null;
-  const targetUrl = campaign ? (campaign.url || url) : (cfg.reelUrl || url);
+  const targetUrl = campaign ? campaign.url || url : cfg.reelUrl || url;
   if (!targetUrl) return err('No URL configured.');
 
   const ctx = await launch(false);
@@ -118,8 +131,14 @@ async function scrapeInstagram(url, campaignId) {
     await page.waitForTimeout(4000);
 
     const html = await page.content();
-    const idMatch = html.match(/"media_id":"(\d+)(?:_\d+)?"/) || html.match(/"mediaId":"(\d+)"/) || html.match(/\/media\/(\d+)\/comments/);
-    if (!idMatch) throw new Error('Could not find the media id in the page — check the reel URL and that you are logged in.');
+    const idMatch =
+      html.match(/"media_id":"(\d+)(?:_\d+)?"/) ||
+      html.match(/"mediaId":"(\d+)"/) ||
+      html.match(/\/media\/(\d+)\/comments/);
+    if (!idMatch)
+      {throw new Error(
+        'Could not find the media id in the page — check the reel URL and that you are logged in.'
+      );}
     const mediaId = idMatch[1];
 
     const owner = await findOwner(page);
@@ -140,7 +159,7 @@ async function scrapeInstagram(url, campaignId) {
     let paginationParams = null;
     let childCommentsParams = null;
 
-    page.on('request', req => {
+    page.on('request', (req) => {
       if (req.url().includes('/api/graphql') && req.method() === 'POST') {
         const post = req.postData() || '';
         const decoded = decodeURIComponent(post).replace(/\+/g, ' ');
@@ -155,17 +174,21 @@ async function scrapeInstagram(url, campaignId) {
       }
     });
 
-    async function gql(params, vars) {
+    function gql(params, vars) {
       const body = params.join('&') + '&variables=' + encodeURIComponent(JSON.stringify(vars));
-      return page.evaluate(async b => {
+      return page.evaluate(async (b) => {
         const r = await fetch('https://www.instagram.com/api/graphql', {
           method: 'POST',
-          headers: { 'content-type': 'application/x-www-form-urlencoded', 'x-requested-with': 'XMLHttpRequest' },
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            'x-requested-with': 'XMLHttpRequest'
+          },
           credentials: 'include',
           body: b
         });
         const t = await r.text();
-        if (!t.trim().startsWith('{')) throw new Error('GraphQL returned a page (status ' + r.status + ')');
+        if (!t.trim().startsWith('{'))
+          {throw new Error('GraphQL returned a page (status ' + r.status + ')');}
         return JSON.parse(t);
       }, body);
     }
@@ -175,11 +198,16 @@ async function scrapeInstagram(url, campaignId) {
       await page.locator('svg[aria-label="Comment"]').first().click({ timeout: 8000 });
       info('Opened the comments dialog…');
       await page.waitForTimeout(6000);
-      await page.locator('div[role="dialog"]').evaluate(el => {
-        const all = [...el.querySelectorAll('*')];
-        const best = all.filter(n => n.scrollHeight > n.clientHeight + 100 && n.clientHeight > 100).sort((a, b) => b.scrollHeight - a.scrollHeight)[0];
-        if (best) best.scrollTop = best.scrollHeight;
-      }).catch(() => {});
+      await page
+        .locator('div[role="dialog"]')
+        .evaluate((el) => {
+          const all = [...el.querySelectorAll('*')];
+          const best = all
+            .filter((n) => n.scrollHeight > n.clientHeight + 100 && n.clientHeight > 100)
+            .sort((a, b) => b.scrollHeight - a.scrollHeight)[0];
+          if (best) best.scrollTop = best.scrollHeight;
+        })
+        .catch(() => {});
       await page.waitForTimeout(3000);
 
       if (!paginationParams) {
@@ -187,7 +215,11 @@ async function scrapeInstagram(url, campaignId) {
         paginationParams = CACHED_PAGINATION_PARAMS;
       }
 
-      const baseVars = { media_id: mediaId, sort_order: 'popular', __relay_internal__pv__PolarisIsLoggedInrelayprovider: true };
+      const baseVars = {
+        media_id: mediaId,
+        sort_order: 'popular',
+        __relay_internal__pv__PolarisIsLoggedInrelayprovider: true
+      };
       let after = null;
       let pageNum = 0;
       let guard = 0;
@@ -197,7 +229,8 @@ async function scrapeInstagram(url, campaignId) {
         const vars = { ...baseVars, first: 50, last: null, before: null, after };
         const j = await gql(paginationParams, vars);
         const conn = (j.data && Object.values(j.data)[0]) || null;
-        if (!conn || !Array.isArray(conn.edges)) throw new Error('Unexpected comments response shape');
+        if (!conn || !Array.isArray(conn.edges))
+          {throw new Error('Unexpected comments response shape');}
         for (const e of conn.edges) {
           const n = e.node;
           if (!n || !n.pk) continue;
@@ -208,14 +241,16 @@ async function scrapeInstagram(url, campaignId) {
         const pi = conn.page_info || {};
         after = pi.end_cursor || null;
         hasMore = !!pi.has_next_page && !!after;
-        info(`Comments page ${pageNum}: ${topComments.length} comments, ${users.size} unique users so far…`);
+        info(
+          `Comments page ${pageNum}: ${topComments.length} comments, ${users.size} unique users so far…`
+        );
         guard++;
         await sleep(600 + Math.random() * 400);
       }
       usedFastPath = true;
       ok(`Loaded ${topComments.length} top-level comments via API.`);
 
-      const withReplies = topComments.filter(c => (c.child_comment_count || 0) > 0);
+      const withReplies = topComments.filter((c) => (c.child_comment_count || 0) > 0);
       info(`${withReplies.length} comments have replies — fetching reply authors…`);
       if (withReplies.length) {
         const replyBtn = page.getByText(/View all \d+ replies?/i).first();
@@ -224,23 +259,38 @@ async function scrapeInstagram(url, campaignId) {
           await page.waitForTimeout(3000);
         }
         if (!childCommentsParams) {
-          warn('Could not capture the replies template — reply authors will be missed (top-level commenters still saved).');
+          warn(
+            'Could not capture the replies template — reply authors will be missed (top-level commenters still saved).'
+          );
         } else {
           let done = 0;
           let noGainStreak = 0;
           for (const c of withReplies) {
             if (noGainStreak >= 80) {
-              warn(`No new users from the last ${noGainStreak} reply fetches (mostly the owner replying) — stopping early.`);
+              warn(
+                `No new users from the last ${noGainStreak} reply fetches (mostly the owner replying) — stopping early.`
+              );
               break;
             }
             const sizeBefore = users.size;
             try {
-              const rv = { media_id: mediaId, comment_id: c.pk, sort_order: 'popular', __relay_internal__pv__PolarisIsLoggedInrelayprovider: true };
+              const rv = {
+                media_id: mediaId,
+                comment_id: c.pk,
+                sort_order: 'popular',
+                __relay_internal__pv__PolarisIsLoggedInrelayprovider: true
+              };
               let rAfter = null;
               let rGuard = 0;
               let rHasMore = true;
               while (rHasMore && rGuard < 30) {
-                const rj = await gql(childCommentsParams, { ...rv, first: 50, last: null, before: null, after: rAfter });
+                const rj = await gql(childCommentsParams, {
+                  ...rv,
+                  first: 50,
+                  last: null,
+                  before: null,
+                  after: rAfter
+                });
                 const rconn = (rj.data && Object.values(rj.data)[0]) || null;
                 if (!rconn || !Array.isArray(rconn.edges)) break;
                 for (const e of rconn.edges) {
@@ -261,7 +311,9 @@ async function scrapeInstagram(url, campaignId) {
             else noGainStreak = 0;
             done++;
             if (done % 25 === 0) {
-              info(`Replies fetched for ${done}/${withReplies.length} comments (${users.size} unique users)…`);
+              info(
+                `Replies fetched for ${done}/${withReplies.length} comments (${users.size} unique users)…`
+              );
               saveCsv(users, cfg.ownerUsername, campaignId);
             }
           }
@@ -277,7 +329,9 @@ async function scrapeInstagram(url, campaignId) {
     if (cfg.ownerUsername) users.delete(cfg.ownerUsername);
 
     const rows = saveCsv(users, cfg.ownerUsername, campaignId);
-    ok(`Done — ${rows.length} unique commenters saved.${usedFastPath ? ' (via GraphQL replay)' : ' (via page scroll)'}`);
+    ok(
+      `Done — ${rows.length} unique commenters saved.${usedFastPath ? ' (via GraphQL replay)' : ' (via page scroll)'}`
+    );
     return rows;
   } catch (e) {
     if (e.message === 'SESSION_EXPIRED') throw e;
@@ -290,9 +344,8 @@ async function scrapeInstagram(url, campaignId) {
 
 // ─── Facebook scraping (GraphQL interception via Playwright) ───
 async function scrapeFacebook(url, campaignId) {
-  const cfg = loadConfig();
   const campaign = campaignId ? loadCampaign(campaignId) : null;
-  const targetUrl = campaign ? (campaign.url || url) : url;
+  const targetUrl = campaign ? campaign.url || url : url;
   if (!targetUrl) return err('No Facebook URL configured.');
 
   const ctx = await launch(false);
@@ -301,7 +354,8 @@ async function scrapeFacebook(url, campaignId) {
     const page = await ctx.newPage();
     page.setDefaultTimeout(25000);
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 90000 });
-    if (page.url().includes('login') || page.url().includes('checkpoint')) throw new Error('SESSION_EXPIRED');
+    if (page.url().includes('login') || page.url().includes('checkpoint'))
+      {throw new Error('SESSION_EXPIRED');}
     await page.waitForTimeout(5000);
 
     const users = new Map();
@@ -312,7 +366,11 @@ async function scrapeFacebook(url, campaignId) {
 
     // Try to find post ID from page
     const html = await page.content();
-    const postIdMatch = html.match(/"post_id":"(\d+)"/) || html.match(/"story_fbid":"(\d+)"/) || html.match(/\/permalink\/(\d+)/) || html.match(/\/posts\/(\d+)/);
+    const postIdMatch =
+      html.match(/"post_id":"(\d+)"/) ||
+      html.match(/"story_fbid":"(\d+)"/) ||
+      html.match(/\/permalink\/(\d+)/) ||
+      html.match(/\/posts\/(\d+)/);
     const postId = postIdMatch ? postIdMatch[1] : null;
     if (postId) {
       info(`Facebook post ID: ${postId}`);
@@ -322,10 +380,14 @@ async function scrapeFacebook(url, campaignId) {
 
     // Intercept GraphQL requests for comment pagination
     let firstCommentParams = null;
-    page.on('request', req => {
+    page.on('request', (req) => {
       if (req.url().includes('graphql') && req.method() === 'POST') {
         const post = req.postData() || '';
-        if (post.includes('CometUFICommentsQuery') || post.includes('comment') || post.includes('feedback')) {
+        if (
+          post.includes('CometUFICommentsQuery') ||
+          post.includes('comment') ||
+          post.includes('feedback')
+        ) {
           if (!firstCommentParams) firstCommentParams = post;
         }
       }
@@ -334,8 +396,10 @@ async function scrapeFacebook(url, campaignId) {
     // Try opening comments section
     step('Looking for comments section…');
     try {
-      const commentBtn = page.locator('[aria-label*="comment" i], [data-testid*="comment"]').first();
-      if (await commentBtn.count() > 0) {
+      const commentBtn = page
+        .locator('[aria-label*="comment" i], [data-testid*="comment"]')
+        .first();
+      if ((await commentBtn.count()) > 0) {
         await commentBtn.click({ timeout: 8000 });
         await page.waitForTimeout(3000);
       }
@@ -353,20 +417,37 @@ async function scrapeFacebook(url, campaignId) {
       await page.waitForTimeout(2000);
 
       // Collect usernames from links
-      const links = await page.evaluate(() => {
-        const results = [];
-        document.querySelectorAll('a[href]').forEach(a => {
-          const href = a.getAttribute('href') || '';
-          const match = href.match(/^\/([a-zA-Z0-9.]+)(?:\/|$)/);
-          if (match && !['login', 'privacy', 'terms', 'help', 'stories', 'watch', 'groups', 'pages', 'marketplace', 'gaming', 'events'].includes(match[1])) {
-            const text = (a.textContent || '').trim();
-            if (text.length > 1 && text.length < 50) {
-              results.push({ username: match[1], comment: text });
+      const links = await page
+        .evaluate(() => {
+          const results = [];
+          document.querySelectorAll('a[href]').forEach((a) => {
+            const href = a.getAttribute('href') || '';
+            const match = href.match(/^\/([a-zA-Z0-9.]+)(?:\/|$)/);
+            if (
+              match &&
+              ![
+                'login',
+                'privacy',
+                'terms',
+                'help',
+                'stories',
+                'watch',
+                'groups',
+                'pages',
+                'marketplace',
+                'gaming',
+                'events'
+              ].includes(match[1])
+            ) {
+              const text = (a.textContent || '').trim();
+              if (text.length > 1 && text.length < 50) {
+                results.push({ username: match[1], comment: text });
+              }
             }
-          }
-        });
-        return results;
-      }).catch(() => []);
+          });
+          return results;
+        })
+        .catch(() => []);
 
       for (const l of links) {
         addUser(l.username, l.comment);
@@ -419,19 +500,28 @@ async function scrapeCommentsViaUI(page, cfg, users) {
     await dialog
       .evaluate(() => {
         const all = [...document.querySelectorAll('div[role="dialog"] *')];
-        const best = all.filter(n => n.scrollHeight > n.clientHeight + 100 && n.clientHeight > 100).sort((a, b) => b.scrollHeight - a.scrollHeight)[0];
+        const best = all
+          .filter((n) => n.scrollHeight > n.clientHeight + 100 && n.clientHeight > 100)
+          .sort((a, b) => b.scrollHeight - a.scrollHeight)[0];
         if (best) best.scrollTop = best.scrollHeight;
       })
       .catch(() => {});
     const links = await dialog
       .evaluate(() =>
         Array.from(document.querySelectorAll('div[role="dialog"] a[href^="/"]'))
-          .map(a => a.getAttribute('href'))
-          .filter(h => h && !h.includes('/p/') && !h.includes('/reel/') && !h.includes('/explore/') && !h.includes('/direct/'))
-          .map(h => h.replace(/^\/|\/$/g, ''))
+          .map((a) => a.getAttribute('href'))
+          .filter(
+            (h) =>
+              h &&
+              !h.includes('/p/') &&
+              !h.includes('/reel/') &&
+              !h.includes('/explore/') &&
+              !h.includes('/direct/')
+          )
+          .map((h) => h.replace(/^\/|\/$/g, ''))
       )
       .catch(() => []);
-    links.forEach(u => {
+    links.forEach((u) => {
       if (u && u !== 'instagram' && !users.has(u)) users.set(u, { comment: '', ts: '' });
     });
     const n = users.size;
@@ -459,11 +549,17 @@ async function scrapeCommentsViaUI(page, cfg, users) {
   try {
     if (platform === 'facebook') {
       step('Detected Facebook post — starting Facebook scraper…');
-      if (campaign) { campaign.status = 'scraping'; saveCampaign(campaign); }
+      if (campaign) {
+        campaign.status = 'scraping';
+        saveCampaign(campaign);
+      }
       await scrapeFacebook(url, campaignId);
     } else {
       step('Detected Instagram post — starting Instagram scraper…');
-      if (campaign) { campaign.status = 'scraping'; saveCampaign(campaign); }
+      if (campaign) {
+        campaign.status = 'scraping';
+        saveCampaign(campaign);
+      }
       await scrapeInstagram(url, campaignId);
     }
 

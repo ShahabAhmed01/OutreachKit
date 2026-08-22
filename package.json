@@ -9,9 +9,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
-    "test": "node --test test/*.test.js",
+    "test": "node --test test/lib.test.js test/test-all-lib.js test/test-edge.js test/test-send.js",
+    "test:server": "node test/test-server.js",
     "test:coverage": "c8 node --test test/*.test.js",
-    "lint": "eslint src/ gui/ test/",
+    "lint": "eslint src/ gui/ test/ scripts/",
     "lint:fix": "eslint src/ gui/ test/ --fix",
     "format": "prettier --write \"src/**/*.js\" \"gui/**/*.js\" \"test/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\" \"gui/**/*.js\" \"test/**/*.js\"",
@@ -19,9 +20,9 @@
     "gui": "node src/server.js",
     "login": "node src/login.js",
     "scrape": "node src/scrape.js",
-    "scan": "node src/inbox.js",
+    "scan": "node src/scan-inbox.js",
     "send": "node src/send.js",
-    "session": "node src/auth.js",
+    "session": "node src/session.js",
     "report": "node src/report.js"
   },
   "keywords": [

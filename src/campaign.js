@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { DATA, CAMPAIGNS_DIR, CONFIG_PATH, ensureData, loadConfig, sanitizeConfig } = require('./config');
+const { CAMPAIGNS_DIR, CONFIG_PATH, loadConfig, sanitizeConfig } = require('./config');
 const { nowIso } = require('./utils');
 
 function generateId() {
@@ -32,7 +32,7 @@ function createCampaign(name, platform, postUrl) {
     messages: {
       text1: [{ id: 'm1', content: 'Hey' }],
       text2: [{ id: 'm2', content: 'I read your comment under a post — are you interested?' }],
-      followups: [],
+      followups: []
     },
     dailyCap: 50,
     delayMinSec: 60,
@@ -40,7 +40,7 @@ function createCampaign(name, platform, postUrl) {
     pauseOnConsecutiveFailures: 3,
     pauseMinutes: 30,
     commentFilter: { enabled: false, keywords: [] },
-    schedule: { enabled: false, start: '09:00', end: '23:00' },
+    schedule: { enabled: false, start: '09:00', end: '23:00' }
   };
 
   fs.writeFileSync(path.join(dir, 'campaign.json'), JSON.stringify(campaign, null, 2));
@@ -140,5 +140,5 @@ module.exports = {
   loadCampaign,
   saveCampaign,
   deleteCampaign,
-  listCampaigns,
+  listCampaigns
 };

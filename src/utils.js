@@ -56,5 +56,5 @@ module.exports = {
   err,
   step,
   sleep,
-  stopSleep,
+  stopSleep
 };

@@ -36,53 +36,53 @@ check('over-max dailyCap to 100', lib.sanitizeConfig({ dailyCap: 999 }).dailyCap
 check('string dailyCap default 50', lib.sanitizeConfig({ dailyCap: 'abc' }).dailyCap === 50);
 check(
   'delayMax<delayMin swapped',
-  lib.sanitizeConfig({ delayMinSec: 100, delayMaxSec: 10 }).delayMaxSec === 100,
+  lib.sanitizeConfig({ delayMinSec: 100, delayMaxSec: 10 }).delayMaxSec === 100
 );
 check('delayMinSec min=2', lib.sanitizeConfig({ delayMinSec: 0 }).delayMinSec === 2);
 check('delayMaxSec max=3600', lib.sanitizeConfig({ delayMaxSec: 9999 }).delayMaxSec === 3600);
 check(
   'pauseFail min=1',
-  lib.sanitizeConfig({ pauseOnConsecutiveFailures: 0 }).pauseOnConsecutiveFailures === 1,
+  lib.sanitizeConfig({ pauseOnConsecutiveFailures: 0 }).pauseOnConsecutiveFailures === 1
 );
 check('pauseMinutes max=600', lib.sanitizeConfig({ pauseMinutes: 9999 }).pauseMinutes === 600);
 
 // sanitizeConfig messages
 const sm = lib.sanitizeConfig({
-  messages: { openers: ['  ', '', 'valid'], questions: [null, 123, 'q1'] },
+  messages: { openers: ['  ', '', 'valid'], questions: [null, 123, 'q1'] }
 });
 check(
   'sanitize empty openers',
-  sm.messages.openers.length === 1 && sm.messages.openers[0] === 'valid',
+  sm.messages.openers.length === 1 && sm.messages.openers[0] === 'valid'
 );
 check(
   'sanitize non-string questions',
-  sm.messages.questions.length === 1 && sm.messages.questions[0] === 'q1',
+  sm.messages.questions.length === 1 && sm.messages.questions[0] === 'q1'
 );
 check('no messages stays undefined', lib.sanitizeConfig({}).messages === undefined);
 
 // validClock
 const vc = lib.sanitizeConfig({
-  schedule: { enabled: true, start: '25:99', end: 'abc' },
+  schedule: { enabled: true, start: '25:99', end: 'abc' }
 });
 check('invalid clock start defaults', vc.schedule.start === '09:00');
 check('invalid clock end defaults', vc.schedule.end === '23:00');
 const vc2 = lib.sanitizeConfig({
-  schedule: { enabled: true, start: '09:30', end: '23:00' },
+  schedule: { enabled: true, start: '09:30', end: '23:00' }
 });
 check('valid clock kept', vc2.schedule.start === '09:30' && vc2.schedule.end === '23:00');
 const vc3 = lib.sanitizeConfig({
-  schedule: { enabled: true, start: '2:5', end: '8:9' },
+  schedule: { enabled: true, start: '2:5', end: '8:9' }
 });
 check('short clock invalid defaults', vc3.schedule.start === '09:00');
 
 // commentFilter
 const cf = lib.sanitizeConfig({
-  commentFilter: { enabled: true, keywords: ['Hello', 'BUY NOW', '  '] },
+  commentFilter: { enabled: true, keywords: ['Hello', 'BUY NOW', '  '] }
 });
 check('commentFilter enabled', cf.commentFilter.enabled === true);
 check(
   'commentFilter keywords lower+trim',
-  cf.commentFilter.keywords.length === 2 && cf.commentFilter.keywords[0] === 'hello',
+  cf.commentFilter.keywords.length === 2 && cf.commentFilter.keywords[0] === 'hello'
 );
 check('commentFilter defaults', lib.sanitizeConfig({}).commentFilter.enabled === false);
 
@@ -107,7 +107,7 @@ const det = [
   [null, 'instagram'],
   [undefined, 'instagram'],
   ['https://tiktok.com/@user', 'instagram'],
-  ['https://youtube.com/watch', 'instagram'],
+  ['https://youtube.com/watch', 'instagram']
 ];
 for (const [url, exp] of det) {
   check('detect: ' + (url || 'null'), lib.detectPlatform(url) === exp);
@@ -117,15 +117,12 @@ for (const [url, exp] of det) {
 check('parseCsv basic', lib.parseCsvText('a,b,c\n1,2,3\n').length === 3);
 check(
   'parseCsv quoted comma',
-  lib.parseCsvText('n,c\nu1,"hello, world"\n')[1][1] === 'hello, world',
+  lib.parseCsvText('n,c\nu1,"hello, world"\n')[1][1] === 'hello, world'
 );
 check('parseCsv escaped quotes', lib.parseCsvText('x\n"s""hi"""\n')[1][0] === 's"hi"');
 check('parseCsv newline in quote', lib.parseCsvText('x\n"l1\nl2"\n')[1][0] === 'l1\nl2');
 check('parseCsv empty', lib.parseCsvText('').length === 1);
-check(
-  'parseCsv mixed endings',
-  lib.parseCsvText('a,b\nc,d\r\ne,f\r\n').length === 4,
-);
+check('parseCsv mixed endings', lib.parseCsvText('a,b\nc,d\r\ne,f\r\n').length === 4);
 
 // escCsv
 check('escCsv plain', lib.escCsv('hello') === 'hello');
@@ -138,11 +135,7 @@ check('escCsv number', lib.escCsv(42) === '42');
 
 // nowIso / todayKey
 const ni = lib.nowIso();
-check(
-  'nowIso format',
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/.test(ni),
-  ni,
-);
+check('nowIso format', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/.test(ni), ni);
 const tk = lib.todayKey();
 check('todayKey format', /^\d{4}-\d{2}-\d{2}$/.test(tk));
 check('todayKey = nowIso prefix', tk === ni.slice(0, 10));
@@ -156,7 +149,7 @@ for (const f of [
   'commenters.csv',
   'sent.csv',
   'already-contacted.csv',
-  'replied.csv',
+  'replied.csv'
 ]) {
   check('create file: ' + f, fs.existsSync(path.join(lib.DATA, 'campaigns', c1.id, f)));
 }
@@ -166,7 +159,7 @@ check('load platform', l1.platform === 'instagram');
 l1.status = 'running';
 l1.text1 = [
   { id: 'm1', content: 'msg1' },
-  { id: 'm2', content: 'msg2' },
+  { id: 'm2', content: 'msg2' }
 ];
 l1.followups = [{ id: 'f1', content: 'fup1' }];
 lib.saveCampaign(l1);
@@ -181,13 +174,13 @@ check('save nonexistent', lib.saveCampaign('nonexistent_xyz', { status: 'x' }) =
 check('save null', lib.saveCampaign(null) === null);
 check('save number', lib.saveCampaign(123) === null);
 check('save string no patch', lib.saveCampaign('nonexistent_xyz') === null);
-check('list has campaign', lib.listCampaigns().some((c) => c.id === c1.id));
+check(
+  'list has campaign',
+  lib.listCampaigns().some((c) => c.id === c1.id)
+);
 lib.deleteCampaign(c1.id);
 check('delete removes load', lib.loadCampaign(c1.id) === null);
-check(
-  'delete removes from list',
-  !lib.listCampaigns().find((c) => c.id === c1.id),
-);
+check('delete removes from list', !lib.listCampaigns().find((c) => c.id === c1.id));
 check('delete nonexistent true', lib.deleteCampaign('nonexistent_xyz') === true);
 
 // activeCampaign reset on delete
@@ -207,9 +200,9 @@ lib.writeCsv(
   'commenters.csv',
   [
     { username: 'alice', comment: 'Great!', commented_at: '2025-01-01T00:00:00.000Z' },
-    { username: 'bob', comment: 'Love!', commented_at: '2025-01-02T00:00:00.000Z' },
+    { username: 'bob', comment: 'Love!', commented_at: '2025-01-02T00:00:00.000Z' }
   ],
-  ct.id,
+  ct.id
 );
 const cr = lib.readCsv('commenters.csv', ct.id);
 check('CSV write/read count', cr.length === 2);
@@ -222,14 +215,14 @@ check('CSV empty write', lib.readCsv('sent.csv', ct.id).length === 0);
 lib.writeCsv(
   'commenters.csv',
   [{ username: 'u,1', comment: 'He said "hi"', commented_at: '' }],
-  ct.id,
+  ct.id
 );
 const sc = lib.readCsv('commenters.csv', ct.id);
 check('CSV special chars', sc[0].username === 'u,1' && sc[0].comment === 'He said "hi"');
 lib.writeCsv(
   'commenters.csv',
   [{ username: 'user_test', comment: 'test', commented_at: '' }],
-  ct.id,
+  ct.id
 );
 const uc = lib.readCsv('commenters.csv', ct.id);
 check('CSV underscores', uc[0].username === 'user_test');

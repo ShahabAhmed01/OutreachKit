@@ -27,32 +27,70 @@ function copyDir(from, to) {
 copyDir(path.join(ROOT, 'src'), path.join(OUT, 'src'));
 copyDir(path.join(ROOT, 'gui'), path.join(OUT, 'gui'));
 copyDir(path.join(ROOT, 'test'), path.join(OUT, 'test'));
-for (const f of ['package.json', 'package-lock.json', 'config.json', 'start.bat', 'README.md', '.gitignore']) {
+for (const f of [
+  'package.json',
+  'package-lock.json',
+  'config.json',
+  'start.bat',
+  'start.sh',
+  'README.md',
+  '.gitignore'
+]) {
   const p = path.join(ROOT, f);
   if (fs.existsSync(p)) fs.copyFileSync(p, path.join(OUT, f));
 }
 fs.mkdirSync(path.join(OUT, 'data'), { recursive: true });
 fs.mkdirSync(path.join(OUT, 'profile'), { recursive: true });
 
+// Ensure the Linux launcher is executable in dist
+const distSh = path.join(OUT, 'start.sh');
+if (fs.existsSync(distSh)) fs.chmodSync(distSh, 0o755);
+
 // Copy campaigns directory if it exists
 if (fs.existsSync(CAMPAIGNS_DIR)) {
   copyDir(CAMPAIGNS_DIR, path.join(OUT, 'data', 'campaigns'));
 }
 
-const zip = path.join(DIST, `${NAME}.zip`);
+// Archive the dist folder. `zip` is preferred (GNU tar cannot write zip archives).
 try {
-  execFileSync('tar', ['-a', '-c', '-f', zip, NAME], { cwd: DIST, stdio: 'pipe' });
+  const zip = path.join(DIST, `${NAME}.zip`);
+  execFileSync('zip', ['-r', '-q', zip, NAME], { cwd: DIST, stdio: 'pipe' });
   console.log('ZIP created: ' + zip);
-} catch (e) {
-  console.log('ZIP failed: ' + String(e.message || e).split('\n')[0]);
+} catch {
+  try {
+    const tgz = path.join(DIST, `${NAME}.tar.gz`);
+    execFileSync('tar', ['-czf', tgz, NAME], { cwd: DIST, stdio: 'pipe' });
+    console.log('TAR.GZ created: ' + tgz);
+  } catch (e) {
+    console.log('Archive failed: ' + String(e.message || e).split('\n')[0]);
+  }
 }
 
 if (process.env.OUTREACHKIT_BUILD_EXE === '1') {
+  const target =
+    process.env.OUTREACHKIT_TARGET ||
+    (process.platform === 'win32' ? 'node24-win-x64' : 'node24-linux-x64');
+  const binName = process.platform === 'win32' ? 'OutreachKit.exe' : 'outreachkit';
   try {
-    execFileSync('npx', ['@yao-pkg/pkg', 'gui/server.js', '--targets', 'node24-win-x64', '--config', path.join(ROOT, 'scripts', 'pkg-config.json'), '--output', path.join(OUT, 'OutreachKit.exe')], { cwd: ROOT, stdio: 'inherit' });
-    console.log('EXE created: ' + path.join(OUT, 'OutreachKit.exe'));
+    execFileSync(
+      'npx',
+      [
+        '@yao-pkg/pkg',
+        'gui/server.js',
+        '--targets',
+        target,
+        '--config',
+        path.join(ROOT, 'scripts', 'pkg-config.json'),
+        '--output',
+        path.join(OUT, binName)
+      ],
+      { cwd: ROOT, stdio: 'inherit' }
+    );
+    console.log('Binary created: ' + path.join(OUT, binName));
   } catch (e) {
-    console.log('EXE build skipped (pkg not installed or failed): ' + String(e.message || e).split('\n')[0]);
+    console.log(
+      'Binary build skipped (pkg not installed or failed): ' + String(e.message || e).split('\n')[0]
+    );
   }
 }
 

@@ -10,7 +10,10 @@ const { launch, DATA, info, ok, err } = require('./lib');
   const page = await ctx.newPage();
 
   try {
-    await page.goto('https://www.instagram.com/', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.goto('https://www.instagram.com/', {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000
+    });
   } catch {}
 
   info('Browser opened. Log in to your business account, then close the window when done.');
@@ -27,7 +30,7 @@ const { launch, DATA, info, ok, err } = require('./lib');
     } catch {}
   }, 2000);
 
-  await new Promise(r => ctx.on('close', r));
+  await new Promise((r) => ctx.on('close', r));
   clearInterval(poll);
 
   if (!detected) {

@@ -40,8 +40,8 @@ function validateCampaignBody(body) {
     data: {
       name: sanitizeString(name),
       url: url.trim(),
-      platform: platform || undefined,
-    },
+      platform: platform || undefined
+    }
   };
 }
 
@@ -100,7 +100,7 @@ function validateConfigBody(body) {
         ? body.commentFilter.keywords
             .filter((k) => typeof k === 'string' && k.trim())
             .map((k) => k.trim().toLowerCase())
-        : [],
+        : []
     };
   }
 
@@ -110,7 +110,7 @@ function validateConfigBody(body) {
     data.schedule = {
       enabled: Boolean(body.schedule.enabled),
       start,
-      end,
+      end
     };
   }
 
@@ -185,5 +185,5 @@ module.exports = {
   validateBackupName,
   validateSendBody,
   validateJobBody,
-  validClock,
+  validClock
 };

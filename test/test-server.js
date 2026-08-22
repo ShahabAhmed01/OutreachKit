@@ -6,7 +6,7 @@ const path = require('path');
 
 let P = 0;
 let F = 0;
-function ok(label) {
+function ok(_label) {
   P++;
 }
 function fail(label, msg) {
@@ -27,7 +27,7 @@ function req(method, urlPath, body, timeout) {
       path: urlPath,
       method,
       headers: {},
-      timeout,
+      timeout
     };
     if (body) opts.headers['Content-Type'] = 'application/json';
     const r = http.request(opts, (res) => {
@@ -55,7 +55,7 @@ function req(method, urlPath, body, timeout) {
   const child = spawn(process.execPath, [path.join(__dirname, '..', 'src', 'server.js')], {
     cwd: path.join(__dirname, '..'),
     env: { ...process.env, OUTREACHKIT_NO_OPEN: '1', PORT: '3000' },
-    stdio: 'ignore',
+    stdio: 'ignore'
   });
   await new Promise((r) => setTimeout(r, 2000));
 
@@ -110,7 +110,7 @@ function req(method, urlPath, body, timeout) {
     r = await req('POST', '/api/campaigns', {
       name: 'API Test',
       url: 'https://instagram.com/reel/1',
-      text1: ['Hey {username}'],
+      text1: ['Hey {username}']
     });
     check('create campaign 201', r.status === 201);
     check('campaign has id', r.json && r.json.id);

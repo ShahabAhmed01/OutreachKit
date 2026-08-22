@@ -15,7 +15,7 @@ const body = [
   `${lib.escCsv('comma,here')},X`,
   `${lib.escCsv('state"q"uote')},Y`,
   `${lib.escCsv('line\nbreak')},Z`,
-  'plain,W',
+  'plain,W'
 ].join('\n');
 const rt = lib.parseCsvText(body);
 assert.strictEqual(rt.length, 5);
@@ -32,7 +32,7 @@ const cfg = lib.sanitizeConfig({
   delayMaxSec: 99999,
   messages: { openers: ['  A  ', '', 3, 'B'], questions: [] },
   commentFilter: { enabled: true, keywords: ['  CRM  ', '', 'soFtWare'] },
-  schedule: { enabled: true, start: '25:00', end: '22:30' },
+  schedule: { enabled: true, start: '25:00', end: '22:30' }
 });
 assert.strictEqual(cfg.dailyCap, 100);
 assert.strictEqual(cfg.delayMinSec, 2);
@@ -50,7 +50,7 @@ assert.match(iso, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/)
 const local = new Date();
 assert.strictEqual(
   key,
-  `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`,
+  `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`
 );
 
 console.log('ALL LIB TESTS PASSED');

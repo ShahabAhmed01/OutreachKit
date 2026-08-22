@@ -26,9 +26,11 @@ const EXIT_GRACE_MS = Number(process.env.EXIT_GRACE_MS || 180000);
 
 fs.mkdirSync(DATA, { recursive: true });
 fs.mkdirSync(path.join(DATA, 'campaigns'), { recursive: true });
-try { fs.rmSync(STOP, { force: true }); } catch {}
+try {
+  fs.rmSync(STOP, { force: true });
+} catch {}
 
-let clients = new Set();
+const clients = new Set();
 let current = null;
 let lastProbe = null;
 
@@ -45,7 +47,7 @@ const apiLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many requests, please try again later' },
+  message: { error: 'Too many requests, please try again later' }
 });
 app.use('/api/', apiLimiter);
 
@@ -54,12 +56,14 @@ app.get('/events', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    Connection: 'keep-alive',
+    Connection: 'keep-alive'
   });
   res.write('retry: 3000\n\n');
   clients.add(res);
   const hb = setInterval(() => {
-    try { res.write(': hb\n\n'); } catch {}
+    try {
+      res.write(': hb\n\n');
+    } catch {}
   }, 15000);
   req.on('close', () => {
     clearInterval(hb);
@@ -80,7 +84,7 @@ const MIME = {
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json',
   '.svg': 'image/svg+xml',
-  '.png': 'image/png',
+  '.png': 'image/png'
 };
 
 function serveStatic(req, res) {
@@ -101,15 +105,24 @@ app.get('/app.js', serveStatic);
 function broadcast(msg) {
   const s = `data: ${JSON.stringify(msg)}\n\n`;
   for (const c of clients) {
-    try { c.write(s); } catch {}
+    try {
+      c.write(s);
+    } catch {}
   }
 }
 
 function logLine(origin, line) {
   const ts = new Date().toISOString().slice(11, 19);
   const entry = `[${ts}] ${origin}: ${line}`;
-  try { fs.appendFileSync(LOG, entry + '\n'); } catch {}
-  broadcast({ time: new Date().toISOString(), from: origin, level: inferLevel(line), message: line });
+  try {
+    fs.appendFileSync(LOG, entry + '\n');
+  } catch {}
+  broadcast({
+    time: new Date().toISOString(),
+    from: origin,
+    level: inferLevel(line),
+    message: line
+  });
 }
 
 function inferLevel(line) {
@@ -147,7 +160,7 @@ function campaignLeadRows(campaignId) {
         status,
         sent_at: sentAt.get(u) || '',
         detected_at: contactedAt.get(u) || '',
-        replied_at: repliedAt.get(u) || '',
+        replied_at: repliedAt.get(u) || ''
       };
     })
     .sort((a, b) => {
@@ -165,7 +178,7 @@ function campaignStats(campaignId) {
   const skip = new Set([
     ...sent.map((r) => r.username),
     ...contacted.map((r) => r.username),
-    ...replied.map((r) => r.username),
+    ...replied.map((r) => r.username)
   ]);
   const remaining = commenters.filter((r) => r.username && !skip.has(r.username)).length;
   return {
@@ -174,7 +187,7 @@ function campaignStats(campaignId) {
     replied: replied.length,
     contacted: contacted.length,
     remaining,
-    sentToday: sent.filter((r) => (r.sent_at || '').startsWith(utils.todayKey())).length,
+    sentToday: sent.filter((r) => (r.sent_at || '').startsWith(utils.todayKey())).length
   };
 }
 
@@ -197,7 +210,9 @@ function globalStatus() {
     if (c.status === 'completed') completed = true;
   }
   let loggedIn = false;
-  try { loggedIn = fs.existsSync(MARKER); } catch {}
+  try {
+    loggedIn = fs.existsSync(MARKER);
+  } catch {}
   return {
     running,
     paused,
@@ -209,17 +224,19 @@ function globalStatus() {
     sent: totalSent,
     replied: totalReplied,
     remaining: totalCommenters - totalSent,
-    config: cfg,
+    config: cfg
   };
 }
 
 function runJob(name, script, args, campaignId) {
   if (current) return { ok: false, error: `${current.name} is already running` };
-  try { fs.rmSync(STOP, { force: true }); } catch {}
+  try {
+    fs.rmSync(STOP, { force: true });
+  } catch {}
   const scriptArgs = [...(args || [])];
   if (campaignId) scriptArgs.push('--campaign', campaignId);
   const child = spawn(process.execPath, [path.join(ROOT, 'src', script), ...scriptArgs], {
-    cwd: ROOT,
+    cwd: ROOT
   });
   current = { name, child, campaignId };
   logLine('server', `[step] Job started — ${name}${campaignId ? ` (${campaignId})` : ''}`);
@@ -255,9 +272,13 @@ function pump(name, chunk) {
           const r = JSON.parse(l.slice('RESULT:'.length));
           lastProbe = { ...r, at: utils.nowIso() };
           if (r.loggedIn) {
-            try { fs.writeFileSync(MARKER, String(Date.now())); } catch {}
+            try {
+              fs.writeFileSync(MARKER, String(Date.now()));
+            } catch {}
           } else {
-            try { fs.rmSync(MARKER, { force: true }); } catch {}
+            try {
+              fs.rmSync(MARKER, { force: true });
+            } catch {}
           }
           broadcast({ type: 'probe', probe: lastProbe });
           return;
@@ -289,7 +310,7 @@ function leadRows() {
         status,
         sent_at: sentAt.get(u) || '',
         detected_at: contactedAt.get(u) || '',
-        replied_at: repliedAt.get(u) || '',
+        replied_at: repliedAt.get(u) || ''
       };
     })
     .sort((a, b) => {
@@ -308,13 +329,14 @@ function backupNow() {
     'sent.csv',
     'already-contacted.csv',
     'replied.csv',
-    'logs.txt',
+    'logs.txt'
   ]) {
     const p = path.join(DATA, f);
     if (fs.existsSync(p)) fs.copyFileSync(p, path.join(dir, f));
   }
-  if (fs.existsSync(config.CONFIG_PATH))
+  if (fs.existsSync(config.CONFIG_PATH)) {
     fs.copyFileSync(config.CONFIG_PATH, path.join(dir, 'config.json'));
+  }
   return dir;
 }
 
@@ -325,7 +347,7 @@ function listBackups() {
       .filter((d) => d.isDirectory())
       .map((d) => ({
         name: d.name,
-        files: fs.readdirSync(path.join(BACKUPS, d.name)).length,
+        files: fs.readdirSync(path.join(BACKUPS, d.name)).length
       }))
       .sort((a, b) => b.name.localeCompare(a.name));
   } catch {
@@ -338,12 +360,7 @@ function restoreBackup(name) {
   if (!v) throw new Error('invalid backup name');
   const dir = security.safePath(BACKUPS, name);
   if (!fs.existsSync(dir)) throw new Error('backup not found');
-  for (const f of [
-    'commenters.csv',
-    'sent.csv',
-    'already-contacted.csv',
-    'replied.csv',
-  ]) {
+  for (const f of ['commenters.csv', 'sent.csv', 'already-contacted.csv', 'replied.csv']) {
     const src = path.join(dir, f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(DATA, f));
   }
@@ -395,12 +412,12 @@ app.get('/api/campaigns/:id/leads', (req, res) => {
   const q = (req.query.q || '').toLowerCase();
   let rows = campaignLeadRows(req.params.id);
   if (status !== 'all') rows = rows.filter((r) => r.status === status);
-  if (q)
+  if (q) {
     rows = rows.filter(
       (r) =>
-        (r.username || '').toLowerCase().includes(q) ||
-        (r.comment || '').toLowerCase().includes(q),
+        (r.username || '').toLowerCase().includes(q) || (r.comment || '').toLowerCase().includes(q)
     );
+  }
   res.json(rows);
 });
 
@@ -439,7 +456,9 @@ app.post('/api/campaigns/:id/pause', (req, res) => {
   if (!c) return res.status(404).json({ error: 'not found' });
   c.status = 'paused';
   campaign.saveCampaign(c);
-  try { fs.writeFileSync(STOP, '1'); } catch {}
+  try {
+    fs.writeFileSync(STOP, '1');
+  } catch {}
   logLine('server', `[warn] Campaign paused — ${req.params.id}`);
   res.json({ ok: true, status: 'paused' });
 });
@@ -450,14 +469,16 @@ app.get('/api/status', (req, res) => res.json(globalStatus()));
 
 // ─── Leads (legacy flat) ───
 app.get('/api/leads', (req, res) => {
-  const q = String(req.query.q || '').toLowerCase().trim();
+  const q = String(req.query.q || '')
+    .toLowerCase()
+    .trim();
   const only = String(req.query.status || 'all');
   const limit = parseInt(req.query.limit || '1000', 10);
   const rows = leadRows()
     .filter(
       (r) =>
         (only === 'all' || r.status === only) &&
-        (!q || r.username.toLowerCase().includes(q) || String(r.comment).toLowerCase().includes(q)),
+        (!q || r.username.toLowerCase().includes(q) || String(r.comment).toLowerCase().includes(q))
     )
     .slice(0, limit);
   res.json(rows);
@@ -485,14 +506,17 @@ app.post('/api/job', (req, res) => {
   const v = validator.validateJobBody(req.body);
   if (!v.valid) return res.status(400).json({ error: v.error });
   const { name } = req.body;
-  if (name === 'login' || name === 'connect')
+  if (name === 'login' || name === 'connect') {
     return res.json(runJob('connect', 'login.js'));
-  if (name === 'scrape' || name === 'gather')
+  }
+  if (name === 'scrape' || name === 'gather') {
     return res.json(runJob('gather', 'scrape.js'));
-  if (name === 'scan') return res.json(runJob('scan', 'inbox.js'));
+  }
+  if (name === 'scan') return res.json(runJob('scan', 'scan-inbox.js'));
   if (name === 'probe') return res.json(runJob('probe', 'session.js'));
-  if (name === 'campaign' || name === 'send')
+  if (name === 'campaign' || name === 'send') {
     return res.json(runJob('campaign', 'send.js', ['--dry']));
+  }
   res.status(400).json({ error: 'unknown job' });
 });
 
@@ -515,7 +539,9 @@ app.post('/api/stop', (req, res) => {
 // ─── Exit ───
 app.post('/api/exit', (req, res) => {
   logLine('server', '[warn] Exit requested — finishing the current lead, then stopping.');
-  try { fs.writeFileSync(STOP, '1'); } catch {}
+  try {
+    fs.writeFileSync(STOP, '1');
+  } catch {}
   const job = current;
   if (job) {
     const deadline = Date.now() + EXIT_GRACE_MS;
@@ -528,7 +554,9 @@ app.post('/api/exit', (req, res) => {
       ) {
         clearInterval(wait);
         if (job.child.exitCode === null) {
-          try { job.child.kill(); } catch {}
+          try {
+            job.child.kill();
+          } catch {}
           logLine('server', '[warn] Campaign did not stop in time — terminated.');
         }
         process.exit(0);
@@ -585,7 +613,13 @@ const server = app.listen(PORT, () => {
   if (!process.env.OUTREACHKIT_NO_OPEN) {
     try {
       const { exec } = require('child_process');
-      exec(`start "" http://localhost:${PORT}`);
+      const cmd =
+        process.platform === 'win32'
+          ? `start "" http://localhost:${PORT}`
+          : process.platform === 'darwin'
+            ? `open http://localhost:${PORT}`
+            : `xdg-open http://localhost:${PORT}`;
+      exec(cmd);
     } catch {}
   }
 });

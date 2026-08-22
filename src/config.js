@@ -25,7 +25,7 @@ function defaults() {
     pauseOnConsecutiveFailures: 3,
     pauseMinutes: 30,
     commentFilter: { enabled: false, keywords: [] },
-    schedule: { enabled: false, start: '09:00', end: '23:00' },
+    schedule: { enabled: false, start: '09:00', end: '23:00' }
   };
 }
 
@@ -68,17 +68,17 @@ function sanitizeConfig(cfg) {
     enabled: !!(cfg.commentFilter && cfg.commentFilter.enabled),
     keywords: sanitizeList(cfg.commentFilter && cfg.commentFilter.keywords, []).map((s) =>
       s.toLowerCase()
-    ),
+    )
   };
   c.schedule = {
     enabled: !!(cfg.schedule && cfg.schedule.enabled),
     start: validClock(cfg.schedule && cfg.schedule.start) || '09:00',
-    end: validClock(cfg.schedule && cfg.schedule.end) || '23:00',
+    end: validClock(cfg.schedule && cfg.schedule.end) || '23:00'
   };
   if (cfg.messages) {
     c.messages = {
       openers: cleanList(cfg.messages.openers, []),
-      questions: cleanList(cfg.messages.questions, ['What are you working on right now?']),
+      questions: cleanList(cfg.messages.questions, ['What are you working on right now?'])
     };
   }
   return c;
@@ -115,5 +115,5 @@ module.exports = {
   validClock,
   clampNum,
   cleanList,
-  sanitizeList,
+  sanitizeList
 };

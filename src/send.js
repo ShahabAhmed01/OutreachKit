@@ -2,10 +2,26 @@
 
 const fs = require('fs');
 const path = require('path');
-const { loadConfig, loadCampaign, saveCampaign, launch, readCsv, appendCsv, info, ok, warn, err, sleep, stopSleep, DATA, nowIso, todayKey } = require('./lib');
+const {
+  loadConfig,
+  loadCampaign,
+  saveCampaign,
+  launch,
+  readCsv,
+  appendCsv,
+  info,
+  ok,
+  warn,
+  err,
+  sleep,
+  stopSleep,
+  DATA,
+  nowIso,
+  todayKey
+} = require('./lib');
 
 const STOP = path.join(DATA, 'stop.flag');
-const pick = a => a[Math.floor(Math.random() * a.length)];
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -17,9 +33,12 @@ function parseArgs() {
 
 function fillTemplate(tpl, lead) {
   return tpl
-    .split('{username}').join(lead.username || '')
-    .split('{comment}').join(lead.comment || '')
-    .split('{link}').join(lead.link || '');
+    .split('{username}')
+    .join(lead.username || '')
+    .split('{comment}')
+    .join(lead.comment || '')
+    .split('{link}')
+    .join(lead.link || '');
 }
 
 function passesFilter(cfg, lead) {
@@ -27,7 +46,7 @@ function passesFilter(cfg, lead) {
   const keywords = cfg.commentFilter.keywords || [];
   if (!keywords.length) return true;
   const c = String(lead.comment || '').toLowerCase();
-  return keywords.some(k => k && c.includes(k));
+  return keywords.some((k) => k && c.includes(k));
 }
 
 function pad2(n) {
@@ -73,19 +92,24 @@ function buildMessageSequence(lead, campaign, cfg) {
         seq.push(fillTemplate(fu, lead));
       }
     }
-    return seq.filter(m => m && m.trim());
+    return seq.filter((m) => m && m.trim());
   }
 
   // Legacy global config
   if (cfg.messages && cfg.messages.openers && cfg.messages.openers.length) {
-    return [pick(cfg.messages.openers), ...cfg.messages.questions].map(m => fillTemplate(m, lead)).filter(m => m.trim());
+    return [pick(cfg.messages.openers), ...cfg.messages.questions]
+      .map((m) => fillTemplate(m, lead))
+      .filter((m) => m.trim());
   }
   return [];
 }
 
 async function sendToInstagram(page, lead, msgs) {
   await page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {});
-  await page.goto('https://www.instagram.com/direct/new/', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto('https://www.instagram.com/direct/new/', {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000
+  });
   if (page.url().includes('accounts/login')) throw new Error('SESSION_EXPIRED');
 
   const search = page.getByRole('textbox').first();
@@ -101,7 +125,10 @@ async function sendToInstagram(page, lead, msgs) {
   }
   const bestIdx = await rows.evaluateAll((els, u) => {
     const scored = els
-      .map(el => ({ len: (el.textContent || '').length, exact: (el.textContent || '').trim() === u }))
+      .map((el) => ({
+        len: (el.textContent || '').length,
+        exact: (el.textContent || '').trim() === u
+      }))
       .map((s, i) => ({ i, len: s.len, exact: s.exact }))
       .sort((a, b) => Number(b.exact) - Number(a.exact) || a.len - b.len);
     return scored[0].i;
@@ -130,8 +157,12 @@ async function sendToInstagram(page, lead, msgs) {
 async function sendToFacebook(page, lead, msgs) {
   // Navigate to Facebook Messenger
   await page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {});
-  await page.goto('https://www.facebook.com/messages/t/', { waitUntil: 'domcontentloaded', timeout: 60000 });
-  if (page.url().includes('login') || page.url().includes('checkpoint')) throw new Error('SESSION_EXPIRED');
+  await page.goto('https://www.facebook.com/messages/t/', {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000
+  });
+  if (page.url().includes('login') || page.url().includes('checkpoint'))
+    {throw new Error('SESSION_EXPIRED');}
 
   await page.waitForTimeout(3000);
 
@@ -144,7 +175,7 @@ async function sendToFacebook(page, lead, msgs) {
 
     // Click on the first result
     const result = page.locator('[role="option"], [role="listbox"] [role="row"]').first();
-    if (await result.count() > 0) {
+    if ((await result.count()) > 0) {
       await result.click();
       await sleep(2000);
     } else {
@@ -178,7 +209,7 @@ async function sendToFacebook(page, lead, msgs) {
   const { campaignId, dry } = parseArgs();
   const campaign = campaignId ? loadCampaign(campaignId) : null;
   const cfg = loadConfig();
-  const platform = campaign ? (campaign.platform || 'instagram') : 'instagram';
+  const platform = campaign ? campaign.platform || 'instagram' : 'instagram';
 
   // Validate message config
   if (campaign) {
@@ -201,7 +232,7 @@ async function sendToFacebook(page, lead, msgs) {
   if (!commenters.length) return err('No commenters — run Gather → Scrape first.');
 
   // Filter
-  const filtered = commenters.filter(r => r.username && passesFilter(cfg, r));
+  const filtered = commenters.filter((r) => r.username && passesFilter(cfg, r));
   if (filtered.length !== commenters.length) {
     info(`Keyword filter kept ${filtered.length} of ${commenters.length} leads.`);
   }
@@ -211,34 +242,44 @@ async function sendToFacebook(page, lead, msgs) {
   const contactedFile = campaignId ? 'already-contacted.csv' : 'already-contacted.csv';
   const repliedFile = campaignId ? 'replied.csv' : 'replied.csv';
 
-  const sent = new Set(readCsv(sentFile, campaignId).map(r => r.username));
-  const contacted = new Set(readCsv(contactedFile, campaignId).map(r => r.username));
-  const replied = new Set(readCsv(repliedFile, campaignId).map(r => r.username));
-  const queue = filtered.filter(r => !sent.has(r.username) && !contacted.has(r.username) && !replied.has(r.username));
+  const sent = new Set(readCsv(sentFile, campaignId).map((r) => r.username));
+  const contacted = new Set(readCsv(contactedFile, campaignId).map((r) => r.username));
+  const replied = new Set(readCsv(repliedFile, campaignId).map((r) => r.username));
+  const queue = filtered.filter(
+    (r) => !sent.has(r.username) && !contacted.has(r.username) && !replied.has(r.username)
+  );
 
-  info(`Leads: ${commenters.length} | after filter: ${filtered.length} | already sent: ${sent.size} | previously contacted: ${contacted.size} | replied: ${replied.size} | to send: ${queue.length}`);
+  info(
+    `Leads: ${commenters.length} | after filter: ${filtered.length} | already sent: ${sent.size} | previously contacted: ${contacted.size} | replied: ${replied.size} | to send: ${queue.length}`
+  );
 
   // Schedule check
   if (!inScheduleWindow(cfg)) {
-    return warn(`Campaign schedule is ${cfg.schedule.start}–${cfg.schedule.end} (local time) — outside that window now, nothing to do.`);
+    return warn(
+      `Campaign schedule is ${cfg.schedule.start}–${cfg.schedule.end} (local time) — outside that window now, nothing to do.`
+    );
   }
 
   // Dry run
   if (dry) {
     ok('DRY RUN — would send this sequence to these first leads:');
-    queue.slice(0, 5).forEach(r => {
+    queue.slice(0, 5).forEach((r) => {
       const seq = buildMessageSequence(r, campaign, cfg);
-      console.log(`  → @${r.username}: ${seq.map(m => `"${m}"`).join(' → ')}`);
+      console.log(`  → @${r.username}: ${seq.map((m) => `"${m}"`).join(' → ')}`);
     });
     info('No messages were actually sent.');
     return;
   }
 
   // Daily cap
-  const sentToday = readCsv(sentFile, campaignId).filter(r => (r.sent_at || '').startsWith(todayKey())).length;
-  const dailyCap = campaign ? (campaign.dailyCap || cfg.dailyCap || 50) : cfg.dailyCap;
+  const sentToday = readCsv(sentFile, campaignId).filter((r) =>
+    (r.sent_at || '').startsWith(todayKey())
+  ).length;
+  const dailyCap = campaign ? campaign.dailyCap || cfg.dailyCap || 50 : cfg.dailyCap;
   if (sentToday >= dailyCap) {
-    return warn(`Daily cap (${dailyCap}) already reached today — nothing to do. Come back tomorrow.`);
+    return warn(
+      `Daily cap (${dailyCap}) already reached today — nothing to do. Come back tomorrow.`
+    );
   }
 
   // Update campaign status
@@ -264,7 +305,9 @@ async function sendToFacebook(page, lead, msgs) {
         break;
       }
       if (!inScheduleWindow(cfg)) {
-        warn(`Campaign schedule window (${cfg.schedule.start}–${cfg.schedule.end}) ended — stopping.`);
+        warn(
+          `Campaign schedule window (${cfg.schedule.start}–${cfg.schedule.end}) ended — stopping.`
+        );
         break;
       }
 
@@ -301,7 +344,9 @@ async function sendToFacebook(page, lead, msgs) {
         const maxFailures = cfg.pauseOnConsecutiveFailures || 5;
         const pauseMinutes = cfg.pauseMinutes || 30;
         if (consecutive >= maxFailures) {
-          err(`Pausing ${pauseMinutes} min — possible action block. Check ${platform === 'facebook' ? 'facebook.com' : 'instagram.com/accounts/status'}.`);
+          err(
+            `Pausing ${pauseMinutes} min — possible action block. Check ${platform === 'facebook' ? 'facebook.com' : 'instagram.com/accounts/status'}.`
+          );
           const aborted = await stopSleep(pauseMinutes * 60000, STOP);
           if (aborted) warn('Stop requested during pause — not waiting out the pause.');
           consecutive = 0;
@@ -310,8 +355,12 @@ async function sendToFacebook(page, lead, msgs) {
 
       if (sentCount > 0 && sentCount % 5 === 0) info(`Progress this run: ${sentCount} sent…`);
       if (fs.existsSync(STOP)) continue;
-      const minDelay = campaign ? (campaign.minDelay || cfg.delayMinSec || 30) : (cfg.delayMinSec || 30);
-      const maxDelay = campaign ? (campaign.maxDelay || cfg.delayMaxSec || 90) : (cfg.delayMaxSec || 90);
+      const minDelay = campaign
+        ? campaign.minDelay || cfg.delayMinSec || 30
+        : cfg.delayMinSec || 30;
+      const maxDelay = campaign
+        ? campaign.maxDelay || cfg.delayMaxSec || 90
+        : cfg.delayMaxSec || 90;
       const delay = minDelay + Math.random() * (maxDelay - minDelay);
       info(`Next lead in ~${Math.round(delay)}s…`);
       await stopSleep(Math.round(delay * 1000), STOP);

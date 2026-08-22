@@ -15,7 +15,30 @@ npx playwright install chromium
 npm start
 ```
 
+Or use the launcher script:
+
+```bash
+./start.sh        # Linux / macOS
+start.bat         # Windows
+```
+
 Open `http://localhost:3000` in your browser.
+
+### Linux (CachyOS / Arch and other distros)
+
+Install Node.js with your package manager:
+
+```bash
+sudo pacman -S nodejs npm      # CachyOS / Arch
+```
+
+Playwright's Chromium may need extra system libraries — install them once:
+
+```bash
+npx playwright install-deps chromium   # requires sudo
+```
+
+Then run `./start.sh` or `npm start` as above.
 
 ## Features
 
@@ -89,6 +112,7 @@ Edit `config.json` in the project root:
 ```bash
 npm start          # Start the dashboard
 npm test           # Run tests
+npm run test:server    # Run server integration tests
 npm run test:coverage  # Run tests with coverage
 npm run lint       # Lint source files
 npm run format     # Format code with Prettier

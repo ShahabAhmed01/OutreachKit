@@ -63,12 +63,7 @@ function buildMessageSequence(lead, campaign, cfg) {
     }
     return seq.filter((m) => m && m.trim());
   }
-  if (
-    cfg &&
-    cfg.messages &&
-    cfg.messages.openers &&
-    cfg.messages.openers.length
-  ) {
+  if (cfg && cfg.messages && cfg.messages.openers && cfg.messages.openers.length) {
     return [pick(cfg.messages.openers), ...cfg.messages.questions]
       .map((m) => fillTemplate(m, lead))
       .filter((m) => m.trim());
@@ -85,7 +80,7 @@ check('fill link', fillTemplate('Check {link}', lead) === 'Check https://example
 check(
   'fill all',
   fillTemplate('{username} said {comment} see {link}', lead) ===
-    'alice said great post! see https://example.com',
+    'alice said great post! see https://example.com'
 );
 check('fill none', fillTemplate('No placeholders', lead) === 'No placeholders');
 check('fill empty', fillTemplate('', lead) === '');
@@ -93,35 +88,41 @@ check('fill unknown', fillTemplate('{missing}', lead) === '{missing}');
 check('fill empty lead', fillTemplate('Hey {username}', {}) === 'Hey ');
 
 // passesFilter
-check('filter disabled', passesFilter({ commentFilter: { enabled: false } }, { comment: 'anything' }));
+check(
+  'filter disabled',
+  passesFilter({ commentFilter: { enabled: false } }, { comment: 'anything' })
+);
 check(
   'filter no kw',
-  passesFilter({ commentFilter: { enabled: true, keywords: [] } }, { comment: 'anything' }),
+  passesFilter({ commentFilter: { enabled: true, keywords: [] } }, { comment: 'anything' })
 );
 check(
   'filter match',
-  passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: 'Hello World' }),
+  passesFilter(
+    { commentFilter: { enabled: true, keywords: ['hello'] } },
+    { comment: 'Hello World' }
+  )
 );
 check(
   'filter no match',
-  !passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: 'Goodbye' }),
+  !passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: 'Goodbye' })
 );
 check(
   'filter multi',
-  passesFilter({ commentFilter: { enabled: true, keywords: ['foo', 'bar'] } }, { comment: 'I like bar' }),
+  passesFilter(
+    { commentFilter: { enabled: true, keywords: ['foo', 'bar'] } },
+    { comment: 'I like bar' }
+  )
 );
 check(
   'filter case',
-  passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: 'HELLO' }),
+  passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: 'HELLO' })
 );
 check(
   'filter empty c',
-  !passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: '' }),
+  !passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, { comment: '' })
 );
-check(
-  'filter no c',
-  !passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, {}),
-);
+check('filter no c', !passesFilter({ commentFilter: { enabled: true, keywords: ['hello'] } }, {}));
 check('filter null', passesFilter(null, { comment: 'x' }));
 check('filter no cf', passesFilter({}, { comment: 'x' }));
 
@@ -129,13 +130,16 @@ check('filter no cf', passesFilter({}, { comment: 'x' }));
 check('sched disabled', inScheduleWindow({ schedule: { enabled: false } }));
 check('sched no cfg', inScheduleWindow({}));
 check('sched null', inScheduleWindow(null));
-check('sched wide', inScheduleWindow({ schedule: { enabled: true, start: '00:00', end: '23:59' } }));
+check(
+  'sched wide',
+  inScheduleWindow({ schedule: { enabled: true, start: '00:00', end: '23:59' } })
+);
 
 // buildMessageSequence
 const cam = {
   text1: ['Hey {username}', 'Hi {username}'],
   text2: ['About {comment}'],
-  followups: ['Follow up', ['A', 'B']],
+  followups: ['Follow up', ['A', 'B']]
 };
 const seq = buildMessageSequence(lead, cam, {});
 check('seq has 4', seq.length === 4);
@@ -155,7 +159,13 @@ check('null all', buildMessageSequence(lead, null, {}).length === 0);
 check('pick single', pick(['only']) === 'only');
 check(
   'pick variety',
-  new Set([pick(['a', 'b']), pick(['a', 'b']), pick(['a', 'b']), pick(['a', 'b']), pick(['a', 'b'])]).size > 1,
+  new Set([
+    pick(['a', 'b']),
+    pick(['a', 'b']),
+    pick(['a', 'b']),
+    pick(['a', 'b']),
+    pick(['a', 'b'])
+  ]).size > 1
 );
 
 // pad2

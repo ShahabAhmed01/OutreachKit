@@ -15,7 +15,7 @@
     logs: [],
     connected: false,
     wizardStep: 1,
-    detectedPlatform: '',
+    detectedPlatform: ''
   };
 
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
@@ -79,7 +79,7 @@
     const res = await fetch(url, {
       method: opts.method || 'GET',
       headers: opts.body ? { 'Content-Type': 'application/json' } : undefined,
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
@@ -111,15 +111,15 @@
 
   // ─── Navigation ───
   function bindNavigation() {
-    $$('.nav-btn').forEach(btn => {
+    $$('.nav-btn').forEach((btn) => {
       btn.addEventListener('click', () => navigate(btn.dataset.view));
     });
   }
 
   function navigate(view) {
     state.view = view;
-    $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-    $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${view}`));
+    $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+    $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${view}`));
     updateTopbar();
   }
 
@@ -131,7 +131,7 @@
       campaigns: ['Campaigns', 'Manage all campaigns'],
       leads: ['Leads', 'Commenters & send status'],
       console: ['Activity', 'Live event stream'],
-      settings: ['Settings', 'Scraper & message config'],
+      settings: ['Settings', 'Scraper & message config']
     };
     const [t, s] = titles[state.view] || ['', ''];
     if (title) title.textContent = t;
@@ -146,21 +146,28 @@
     const overlay = $('.sidebar-overlay');
 
     if (toggle) toggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
-    if (mobileBtn) mobileBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('open');
-    });
-    if (overlay) overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('open');
-    });
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+      });
+    }
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      });
+    }
   }
 
   // ─── Dashboard ───
   function renderDashboard() {
     const d = state.dashboard;
     if (!d) return;
-    const set = (id, v) => { const el = $(`#${id}`); if (el) el.textContent = v; };
+    const set = (id, v) => {
+      const el = $(`#${id}`);
+      if (el) el.textContent = v;
+    };
     set('stat-total', d.total || 0);
     set('stat-sent', d.sent || 0);
     set('stat-replied', d.replied || 0);
@@ -179,10 +186,17 @@
     if (!pill || !state.dashboard) return;
     const { running, paused, completed } = state.dashboard;
     pill.classList.remove('running', 'done');
-    if (running) { pill.classList.add('running'); pill.innerHTML = '<span class="pill-dot"></span>Running'; }
-    else if (completed) { pill.classList.add('done'); pill.innerHTML = '<span class="pill-dot"></span>Done'; }
-    else if (paused) { pill.innerHTML = '<span class="pill-dot"></span>Paused'; }
-    else { pill.innerHTML = '<span class="pill-dot"></span>Idle'; }
+    if (running) {
+      pill.classList.add('running');
+      pill.innerHTML = '<span class="pill-dot"></span>Running';
+    } else if (completed) {
+      pill.classList.add('done');
+      pill.innerHTML = '<span class="pill-dot"></span>Done';
+    } else if (paused) {
+      pill.innerHTML = '<span class="pill-dot"></span>Paused';
+    } else {
+      pill.innerHTML = '<span class="pill-dot"></span>Idle';
+    }
   }
 
   // ─── Campaign List (sidebar) ───
@@ -191,7 +205,7 @@
     if (!list) return;
     list.innerHTML = '';
     const campaigns = state.campaigns || [];
-    campaigns.forEach(c => {
+    campaigns.forEach((c) => {
       const item = document.createElement('div');
       item.className = `campaign-item${c.id === state.activeCampaign ? ' active' : ''}`;
       item.innerHTML = `
@@ -217,7 +231,7 @@
       grid.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7h18"/><path d="M8 11h2m4 0h2"/></svg><p>No campaigns yet. Click "New Campaign" to get started.</p></div>`;
       return;
     }
-    campaigns.forEach(c => {
+    campaigns.forEach((c) => {
       const card = document.createElement('div');
       card.className = `campaign-card ${c.platform || 'instagram'}${c.id === state.activeCampaign ? ' active' : ''}`;
       const stats = c.stats || {};
@@ -235,9 +249,9 @@
           <div class="campaign-stat"><div class="campaign-stat-value">${stats.replied || 0}</div><div class="campaign-stat-label">Replied</div></div>
         </div>
         <div class="campaign-card-actions">
-          ${(c.status === 'draft' || c.status === 'idle') ? `<button class="btn btn-primary btn-sm" data-action="scrape" data-id="${c.id}">Scrape</button>` : ''}
+          ${c.status === 'draft' || c.status === 'idle' ? `<button class="btn btn-primary btn-sm" data-action="scrape" data-id="${c.id}">Scrape</button>` : ''}
           ${c.status === 'scraping' ? `<button class="btn btn-ghost btn-sm" disabled>Scraping...</button>` : ''}
-          ${(c.status === 'idle' || c.status === 'completed' || c.status === 'paused') ? `<button class="btn btn-primary btn-sm" data-action="start" data-id="${c.id}">Send</button>` : ''}
+          ${c.status === 'idle' || c.status === 'completed' || c.status === 'paused' ? `<button class="btn btn-primary btn-sm" data-action="start" data-id="${c.id}">Send</button>` : ''}
           ${c.status === 'running' ? `<button class="btn btn-ghost btn-sm" data-action="pause" data-id="${c.id}">Pause</button>` : ''}
           <button class="btn btn-danger btn-sm" data-action="delete" data-id="${c.id}">Delete</button>
         </div>`;
@@ -250,7 +264,7 @@
       grid.appendChild(card);
     });
 
-    $$('[data-action]').forEach(btn => {
+    $$('[data-action]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         handleCampaignAction(btn.dataset.action, btn.dataset.id);
@@ -291,15 +305,21 @@
     if (filter === 'new') leads = state.leads || [];
     else if (filter === 'sent') leads = state.sentLeads || [];
     else if (filter === 'replied') leads = state.repliedLeads || [];
-    else leads = [...(state.leads || []), ...(state.sentLeads || []), ...(state.repliedLeads || [])];
+    else
+      {leads = [...(state.leads || []), ...(state.sentLeads || []), ...(state.repliedLeads || [])];}
 
     const q = (state.search || '').toLowerCase();
-    if (q) leads = leads.filter(l => (l.username || '').toLowerCase().includes(q) || (l.comment || '').toLowerCase().includes(q));
+    if (q)
+      {leads = leads.filter(
+        (l) =>
+          (l.username || '').toLowerCase().includes(q) ||
+          (l.comment || '').toLowerCase().includes(q)
+      );}
 
     const countEl = $('#lead-count');
     if (countEl) countEl.textContent = `${leads.length} lead${leads.length !== 1 ? 's' : ''}`;
 
-    leads.forEach(lead => {
+    leads.forEach((lead) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="td-user">@${escapeHtml(lead.username)}</td>
@@ -313,9 +333,12 @@
       tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><p>No leads match this filter.</p></td></tr>`;
     }
 
-    $$('.chip').forEach(chip => {
+    $$('.chip').forEach((chip) => {
       chip.classList.toggle('active', chip.dataset.filter === filter);
-      chip.onclick = () => { state.leadsFilter = chip.dataset.filter; renderLeads(); };
+      chip.onclick = () => {
+        state.leadsFilter = chip.dataset.filter;
+        renderLeads();
+      };
     });
   }
 
@@ -333,13 +356,15 @@
   // ─── Console ───
   function bindConsole() {
     const clearBtn = $('#clear-logs');
-    if (clearBtn) clearBtn.addEventListener('click', () => {
-      state.logs = [];
-      const out = $('#log-output');
-      if (out) out.innerHTML = '';
-      const count = $('#log-count');
-      if (count) count.textContent = '0';
-    });
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        state.logs = [];
+        const out = $('#log-output');
+        if (out) out.innerHTML = '';
+        const count = $('#log-count');
+        if (count) count.textContent = '0';
+      });
+    }
   }
 
   // ─── Settings ───
@@ -354,7 +379,9 @@
           maxDelay: parseInt($('#max-delay').value) || 90,
           messagePause: parseInt($('#message-pause').value) || 180,
           text1: $('#text1').value,
-          followups: $('#followups').value.split('\n').filter(l => l.trim()),
+          followups: $('#followups')
+            .value.split('\n')
+            .filter((l) => l.trim()),
           alreadyContactedFile: $('#already-contacted-file').value,
           dmCap: parseInt($('#dm-cap').value) || 0,
           dmWindow: $('#dm-window').value || '',
@@ -363,12 +390,15 @@
           dmMinDelay: parseInt($('#dm-min-delay').value) || 5,
           dmMaxDelay: parseInt($('#dm-max-delay').value) || 15,
           dmSessionTimeout: parseInt($('#dm-session-timeout').value) || 0,
-          dmScrollPause: parseInt($('#dm-scroll-pause').value) || 3,
+          dmScrollPause: parseInt($('#dm-scroll-pause').value) || 3
         };
         try {
           await api('/config', { method: 'POST', body: data });
           const status = $('#save-status');
-          if (status) { status.textContent = 'Saved'; setTimeout(() => status.textContent = '', 2000); }
+          if (status) {
+            status.textContent = 'Saved';
+            setTimeout(() => (status.textContent = ''), 2000);
+          }
           await refreshAll();
         } catch (err) {
           console.error('Save failed:', err);
@@ -379,7 +409,10 @@
 
   function renderSettings() {
     const c = state.config || {};
-    const set = (id, v) => { const el = $(`#${id}`); if (el) el.value = v ?? ''; };
+    const set = (id, v) => {
+      const el = $(`#${id}`);
+      if (el) el.value = v ?? '';
+    };
     set('daily-cap', c.dailyCap || 50);
     set('min-delay', c.minDelay || 30);
     set('max-delay', c.maxDelay || 90);
@@ -395,13 +428,10 @@
     set('dm-max-delay', c.dmMaxDelay || 15);
     set('dm-session-timeout', c.dmSessionTimeout || 0);
     set('dm-scroll-pause', c.dmScrollPause || 3);
-    const path = $('#session-path');
-    if (path) path.value = c.sessionPath || 'C:\\Users\\Shahab Ahmed\\AppData\\Local\\Google\\Chrome\\User Data';
   }
 
   // ─── Wizard ───
   function bindWizard() {
-    const overlay = $('#modalOverlay');
     const newBtn = $('#btn-new-campaign');
     const closeBtn = $('#modalClose');
     const backBtn = $('#wizBack');
@@ -419,7 +449,7 @@
     if (urlInput) urlInput.addEventListener('input', detectPlatform);
 
     if (addVariantBtns.length) {
-      addVariantBtns.forEach(btn => {
+      addVariantBtns.forEach((btn) => {
         btn.addEventListener('click', () => addVariantRow(btn.dataset.target));
       });
     }
@@ -472,7 +502,7 @@
 
   function updateWizard() {
     const step = state.wizardStep;
-    $$('.wizard-step').forEach(s => {
+    $$('.wizard-step').forEach((s) => {
       const n = parseInt(s.dataset.step);
       s.classList.toggle('active', n === step);
     });
@@ -517,11 +547,14 @@
   function resetWizard() {
     state.wizardStep = 1;
     state.detectedPlatform = '';
-    ['wizName', 'wizUrl'].forEach(id => { const el = $(`#${id}`); if (el) el.value = ''; });
-    $$('.variant-input').forEach(el => el.value = '');
-    $$('.variants-container').forEach(c => {
+    ['wizName', 'wizUrl'].forEach((id) => {
+      const el = $(`#${id}`);
+      if (el) el.value = '';
+    });
+    $$('.variant-input').forEach((el) => (el.value = ''));
+    $$('.variants-container').forEach((c) => {
       const rows = $$('.variant-row', c);
-      rows.slice(1).forEach(r => r.remove());
+      rows.slice(1).forEach((r) => r.remove());
     });
     const badge = $('#wizPlatformBadge');
     if (badge) badge.hidden = true;
@@ -571,7 +604,7 @@
 
     const getVariantTexts = (containerId) => {
       const inputs = $$(`#${containerId} .variant-input`);
-      return inputs.map(i => i.value.trim()).filter(Boolean);
+      return inputs.map((i) => i.value.trim()).filter(Boolean);
     };
 
     const text1 = getVariantTexts('wizText1');
@@ -581,7 +614,7 @@
     const followupContainer = $('#wizFollowups');
     const followups = [];
     if (followupContainer) {
-      $$('.variant-input', followupContainer).forEach(el => {
+      $$('.variant-input', followupContainer).forEach((el) => {
         const val = el.value.trim();
         if (val) followups.push(val);
       });
@@ -596,7 +629,7 @@
     try {
       await api('/campaigns', {
         method: 'POST',
-        body: { url, name, platform, text1, text2, followups, dailyCap, minDelay, maxDelay },
+        body: { url, name, platform, text1, text2, followups, dailyCap, minDelay, maxDelay }
       });
       closeWizard();
       await refreshAll();

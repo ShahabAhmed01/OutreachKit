@@ -18,7 +18,6 @@ module.exports = {
   CAMPAIGNS_DIR: config.CAMPAIGNS_DIR,
   PROFILE: config.PROFILE,
   CONFIG_PATH: config.CONFIG_PATH,
-  IG_APP_ID: config.IG_APP_ID,
   ensureData: config.ensureData,
   loadConfig: config.loadConfig,
   saveConfig: config.saveConfig,
@@ -46,6 +45,20 @@ module.exports = {
   apiGet: browser.apiGet,
   apiPost: browser.apiPost,
 
+  // Security
+  isValidFilename: security.isValidFilename,
+  safePath: security.safePath,
+  sanitizeString: security.sanitizeString,
+  isValidOutreachUrl: security.isValidOutreachUrl,
+  clampNumber: security.clampNumber,
+
+  // Validator
+  validateCampaignBody: validator.validateCampaignBody,
+  validateConfigBody: validator.validateConfigBody,
+  validateBackupName: validator.validateBackupName,
+  validateSendBody: validator.validateSendBody,
+  validateJobBody: validator.validateJobBody,
+
   // Utils
   nowIso: utils.nowIso,
   todayKey: utils.todayKey,
@@ -72,5 +85,5 @@ module.exports = {
       } catch {}
     }
     return markerRemoved;
-  },
+  }
 };

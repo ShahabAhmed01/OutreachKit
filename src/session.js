@@ -17,7 +17,9 @@ const { launch, PROFILE, ok, warn } = require('./lib');
     ok('Probing saved session…');
     ctx = await launch(true);
     const page = await ctx.newPage();
-    await page.goto('https://www.instagram.com/', { waitUntil: 'domcontentloaded', timeout: 60000 }).catch(() => {});
+    await page
+      .goto('https://www.instagram.com/', { waitUntil: 'domcontentloaded', timeout: 60000 })
+      .catch(() => {});
     if (page.url().includes('accounts/login')) {
       result.reason = 'login-redirect';
     } else {

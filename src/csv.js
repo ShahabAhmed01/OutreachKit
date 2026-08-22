@@ -125,5 +125,5 @@ module.exports = {
   writeCsv,
   appendCsv,
   atomicWrite,
-  campaignDataPath,
+  campaignDataPath
 };
