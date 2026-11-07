@@ -40,6 +40,24 @@ npx playwright install-deps chromium   # requires sudo
 
 Then run `./start.sh` or `npm start` as above.
 
+
+### macOS
+
+Install Node.js, then use the same launcher as Linux:
+
+```bash
+brew install node            # with Homebrew
+./start.sh                   # or npm start
+```
+
+If Chromium fails to launch after `npx playwright install chromium`, install
+the browser dependencies once (this may require `sudo`):
+
+```bash
+npx playwright install-deps chromium   # requires sudo
+```
+
+
 ## Features
 
 - **Multi-platform** — Instagram & Facebook DM automation
