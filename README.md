@@ -4,7 +4,7 @@ Open-source Instagram & Facebook DM automation. Scrape commenters, send personal
 
 [![CI](https://github.com/ShahabAhmed01/OutreachKit/actions/workflows/ci.yml/badge.svg)](https://github.com/ShahabAhmed01/OutreachKit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-339933.svg?logo=node.js)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-339933.svg?logo=node.js)](https://nodejs.org)
 
 ![OutreachKit dashboard](assets/social-preview.png)
 
@@ -112,7 +112,6 @@ Settings can also be changed through the dashboard's Settings page.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `3000` | Server port |
-| `NODE_ENV` | `development` | Set to `production` for stricter security headers |
 
 ## Scripts
 
@@ -134,14 +133,16 @@ src/
 ├── csv.js          # CSV parsing and writing
 ├── campaign.js     # Campaign CRUD operations
 ├── scrape.js       # Instagram/Facebook GraphQL scraping
+├── scan-inbox.js   # Inbox scanning for replies
 ├── send.js         # DM sending logic
-├── inbox.js        # Inbox scanning for replies
-├── auth.js         # Login and session detection
+├── session.js      # Login/session detection (Playwright)
+├── login.js        # Interactive login flow
 ├── validator.js    # Input validation helpers
 ├── security.js     # Security helpers (path traversal, sanitize)
+├── report.js       # Campaign activity reports
 └── utils.js        # Logging, timestamps, sleep helpers
 gui/
-├── server.js       # Server entry point
+├── server.js       # Static dashboard file server
 ├── index.html      # Dashboard HTML
 ├── app.js          # Frontend JavaScript
 └── app.css         # Dashboard styles
