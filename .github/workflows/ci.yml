@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -20,6 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -29,15 +37,13 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Format check
         run: npm run format:check
-        continue-on-error: true
 
       - name: Run unit tests
-        run: node test/lib.test.js && node test/test-all-lib.js && node test/test-edge.js && node test/test-send.js
+        run: npm test
 
       - name: Run server tests
         run: node test/test-server.js
-        timeout-minutes: 2
+        timeout-minutes: 5
