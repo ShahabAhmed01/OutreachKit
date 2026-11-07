@@ -1,7 +1,7 @@
 {
   "campaigns": [],
-  "activeCampaign": "c_mw6jpcvn_0sndi",
-  "ownerUsername": "kevin",
+  "activeCampaign": null,
+  "ownerUsername": "",
   "dailyCap": 50,
   "delayMinSec": 60,
   "delayMaxSec": 120,
