@@ -149,7 +149,7 @@ gui/
 
 ## Requirements
 
-- Node.js >= 18
+- Node.js >= 20
 - A Chrome, Edge, or Chromium-based browser (for Playwright automation)
 - An Instagram or Facebook business account
 - Internet access (to reach Instagram/Facebook)
