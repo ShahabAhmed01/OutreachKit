@@ -1,10 +1,10 @@
 {
   "campaigns": [],
-  "activeCampaign": "c_mt4cijy2_x0nij",
-  "ownerUsername": "",
+  "activeCampaign": "c_mw6jpcvn_0sndi",
+  "ownerUsername": "kevin",
   "dailyCap": 50,
-  "delayMinSec": 3600,
-  "delayMaxSec": 3600,
+  "delayMinSec": 60,
+  "delayMaxSec": 120,
   "pauseOnConsecutiveFailures": 3,
   "pauseMinutes": 30,
   "commentFilter": {
