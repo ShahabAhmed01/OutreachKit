@@ -41,6 +41,7 @@ npm-debug.log*
 test/_debug.js
 test/_screenshots.js
 screenshots/
+!assets/screenshots/
 
 # Environment
 .env
