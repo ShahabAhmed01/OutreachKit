@@ -155,7 +155,10 @@ check('legacy len', ls.length === 3);
 check('empty cam', buildMessageSequence(lead, {}, {}).length === 0);
 check('null all', buildMessageSequence(lead, null, {}).length === 0);
 
-// pick
+// pick — Math.random stubbed deterministically so the test cannot flake
+const origRandom = Math.random;
+let randomCalls = 0;
+Math.random = () => (randomCalls++ % 2 === 0 ? 0 : 0.9999);
 check('pick single', pick(['only']) === 'only');
 check(
   'pick variety',
@@ -167,6 +170,7 @@ check(
     pick(['a', 'b'])
   ]).size > 1
 );
+Math.random = origRandom;
 
 // pad2
 check('pad2 0', pad2(0) === '00');
