@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
-    "test": "node --test test/lib.test.js test/test-all-lib.js test/test-edge.js test/test-send.js",
+    "test": "node test/lib.test.js && node test/test-all-lib.js && node test/test-edge.js && node test/test-send.js",
     "test:server": "node test/test-server.js",
     "test:coverage": "c8 node --test test/*.test.js",
     "lint": "eslint src/ gui/ test/ scripts/",
@@ -46,20 +46,22 @@
   "license": "MIT",
   "type": "commonjs",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "express-rate-limit": "^7.4.0",
     "helmet": "^8.0.0",
-    "playwright": "^1.62.1",
-    "uuid": "^14.0.1"
+    "playwright": "^1.62.1"
   },
   "devDependencies": {
     "c8": "^10.1.0",
     "eslint": "^9.12.0",
     "prettier": "^3.3.0"
+  },
+  "overrides": {
+    "qs": "6.17.1"
   },
   "repository": {
     "type": "git",

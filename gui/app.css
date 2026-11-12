@@ -1340,6 +1340,9 @@ textarea.form-input {
   justify-content: center;
   z-index: 1000;
 }
+.modal-overlay[hidden] {
+  display: none;
+}
 
 .modal {
   width: 90%;

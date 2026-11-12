@@ -17,6 +17,10 @@ function check(label, cond, msg) {
   else fail(label, msg || String(cond));
 }
 
+// Save and restore the real config.json so this suite does not pollute
+// other test files that read config from disk.
+const origCfgText = fs.readFileSync(lib.CONFIG_PATH, 'utf8');
+
 // ensureData
 lib.ensureData();
 check('ensureData DATA', fs.existsSync(lib.DATA));
@@ -255,6 +259,9 @@ check('listCampaigns cleans orphans', lib.loadConfig().campaigns.length < before
 for (const c of lib.listCampaigns()) {
   lib.deleteCampaign(c.id);
 }
+
+// Restore the original config so other test suites are not affected.
+fs.writeFileSync(lib.CONFIG_PATH, origCfgText);
 
 console.log('\n=== lib.js: ' + P + ' passed, ' + F + ' failed ===');
 if (F > 0) process.exit(1);
