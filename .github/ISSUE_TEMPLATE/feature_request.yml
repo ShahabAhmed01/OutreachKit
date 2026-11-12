@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest a new feature or enhancement
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Feature request\n\nHave a suggestion for OutreachKit? Tell us about it."
+  - type: textarea
+    attributes:
+      label: Problem
+      description: What problem are you trying to solve? Is your feature request related to a problem? Please describe.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed solution
+      description: Describe the solution you'd like.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives
+      description: Describe any alternative solutions or features you've considered.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Expected benefit
+      description: Who would benefit from this feature and how?
+    validations:
+      required: false

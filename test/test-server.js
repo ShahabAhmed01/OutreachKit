@@ -146,7 +146,15 @@ function req(method, urlPath, body, timeout) {
     r = await req('POST', '/api/campaigns/' + cid + '/scrape');
     check('scrape 200', r.status === 200);
     check('scrape ok', r.json && r.json.ok);
-    await new Promise((res) => setTimeout(res, 2000));
+    // Wait for the scrape job to actually finish (it launches a real browser),
+    // otherwise a concurrent job blocks the subsequent /start call.
+    let scraped = false;
+    for (let i = 0; i < 30 && !scraped; i++) {
+      await new Promise((res) => setTimeout(res, 1000));
+      const s = await req('GET', '/api/campaigns/' + cid);
+      if (s.json && s.json.status !== 'scraping') scraped = true;
+    }
+    check('scrape finished', scraped);
 
     // Start
     r = await req('POST', '/api/campaigns/' + cid + '/start');

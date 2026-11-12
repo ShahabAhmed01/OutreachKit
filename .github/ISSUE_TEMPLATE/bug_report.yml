@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a bug or unexpected behavior
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Bug report\n\nHelp us improve OutreachKit by reporting what went wrong."
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction steps
+      description: Steps to reproduce the issue
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Environment
+      description: |
+        - OS (Windows/macOS/Linux):
+        - Node.js version (`node --version`):
+        - OutreachKit version:
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Relevant logs
+      description: Paste any relevant log output. **Redact any credentials, session tokens, or personal data before pasting.**
+    validations:
+      required: false
